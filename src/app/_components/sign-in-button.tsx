@@ -1,6 +1,6 @@
 "use client";
 
-import { authClient } from "~/server/better-auth/client";
+import { authClient } from "~/server/better-auth";
 
 export function SignInButton() {
   return (

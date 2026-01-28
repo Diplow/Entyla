@@ -1,0 +1,5 @@
+{
+  "type": "app",
+  "allowed": ["~/server/better-auth"],
+  "allowedChildren": ["react", "next"]
+}

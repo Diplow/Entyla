@@ -1,0 +1,4 @@
+{
+  "type": "router",
+  "allowed": ["~/server/db"]
+}

@@ -3,8 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { SignInButton } from "~/app/_components/sign-in-button";
-import { auth } from "~/server/better-auth";
-import { getSession } from "~/server/better-auth/server";
+import { auth, getSession } from "~/server/better-auth";
 
 export default async function Home() {
   const session = await getSession();
