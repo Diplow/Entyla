@@ -1,12 +1,12 @@
 import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import { SignInButton } from "~/app/_components/sign-in-button";
-import { auth, getSession } from "~/server/better-auth";
+import { SignOutButton } from "~/app/_components/sign-out-button";
+import { IamService } from "~/lib/domains";
 
 export default async function Home() {
-  const session = await getSession();
+  const currentUser = await IamService.getCurrentUser(await headers());
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
@@ -41,9 +41,9 @@ export default async function Home() {
         <div className="flex flex-col items-center gap-2">
           <div className="flex flex-col items-center justify-center gap-4">
             <p className="text-center text-2xl text-white">
-              {session && <span>Logged in as {session.user?.name}</span>}
+              {currentUser && <span>Logged in as {currentUser.name}</span>}
             </p>
-            {!session ? (
+            {!currentUser ? (
               <SignInButton />
             ) : (
               <div className="flex flex-col items-center gap-4">
@@ -53,20 +53,7 @@ export default async function Home() {
                 >
                   View Contacts
                 </Link>
-                <form>
-                  <button
-                    className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
-                    formAction={async () => {
-                      "use server";
-                      await auth.api.signOut({
-                        headers: await headers(),
-                      });
-                      redirect("/");
-                    }}
-                  >
-                    Sign out
-                  </button>
-                </form>
+                <SignOutButton />
               </div>
             )}
           </div>

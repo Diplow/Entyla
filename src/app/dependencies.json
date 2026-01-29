@@ -1,6 +1,6 @@
 {
   "type": "app",
-  "allowed": ["~/server/better-auth", "~/lib/auth-client"],
+  "allowed": ["~/lib/domains", "~/lib/auth-client"],
   "allowedChildren": ["react", "next"],
   "subsystems": ["./api", "./contacts"]
 }

@@ -1,7 +1,6 @@
 import { z } from "zod";
 
-import { auth } from "~/server/better-auth";
-import { ContactService } from "~/lib/domains";
+import { ContactService, IamService } from "~/lib/domains";
 import { headers } from "next/headers";
 
 const createContactSchema = z.object({
@@ -15,18 +14,18 @@ const createContactSchema = z.object({
 });
 
 export async function GET() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) {
+  const currentUser = await IamService.getCurrentUser(await headers());
+  if (!currentUser) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const contacts = await ContactService.list(session.user.id);
+  const contacts = await ContactService.list(currentUser.id);
   return Response.json(contacts);
 }
 
 export async function POST(request: Request) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) {
+  const currentUser = await IamService.getCurrentUser(await headers());
+  if (!currentUser) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -36,6 +35,6 @@ export async function POST(request: Request) {
     return Response.json({ error: parseResult.error.flatten() }, { status: 400 });
   }
 
-  const createdContact = await ContactService.create(session.user.id, parseResult.data);
+  const createdContact = await ContactService.create(currentUser.id, parseResult.data);
   return Response.json(createdContact, { status: 201 });
 }

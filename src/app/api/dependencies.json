@@ -1,4 +1,5 @@
 {
-  "type": "boundary",
-  "allowed": ["~/server/better-auth", "~/lib/domains", "zod"]
+  "type": "router",
+  "allowed": ["~/lib/domains", "zod"],
+  "subsystems": ["./auth"]
 }

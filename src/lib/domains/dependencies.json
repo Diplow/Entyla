@@ -1,5 +1,5 @@
 {
   "type": "router",
-  "allowed": ["~/server/db"],
-  "subsystems": ["./prospect"]
+  "allowed": ["~/server/db", "~/lib/logging"],
+  "subsystems": ["./prospect", "./iam"]
 }

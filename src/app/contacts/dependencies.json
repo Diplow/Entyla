@@ -1,4 +1,4 @@
 {
   "type": "page",
-  "allowed": ["~/server/better-auth"]
+  "allowed": ["~/lib/domains"]
 }

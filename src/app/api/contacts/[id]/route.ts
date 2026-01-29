@@ -1,7 +1,6 @@
 import { z } from "zod";
 
-import { auth } from "~/server/better-auth";
-import { ContactService } from "~/lib/domains";
+import { ContactService, IamService } from "~/lib/domains";
 import { headers } from "next/headers";
 
 const updateContactSchema = z.object({
@@ -18,8 +17,8 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) {
+  const currentUser = await IamService.getCurrentUser(await headers());
+  if (!currentUser) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -29,7 +28,7 @@ export async function GET(
     return Response.json({ error: "Invalid id" }, { status: 400 });
   }
 
-  const contact = await ContactService.getById(contactId, session.user.id);
+  const contact = await ContactService.getById(contactId, currentUser.id);
   if (!contact) {
     return Response.json({ error: "Not found" }, { status: 404 });
   }
@@ -41,8 +40,8 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) {
+  const currentUser = await IamService.getCurrentUser(await headers());
+  if (!currentUser) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -58,7 +57,7 @@ export async function PUT(
     return Response.json({ error: "Invalid id" }, { status: 400 });
   }
 
-  const updatedContact = await ContactService.update(contactId, session.user.id, parseResult.data);
+  const updatedContact = await ContactService.update(contactId, currentUser.id, parseResult.data);
   if (!updatedContact) {
     return Response.json({ error: "Not found" }, { status: 404 });
   }
@@ -70,8 +69,8 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) {
+  const currentUser = await IamService.getCurrentUser(await headers());
+  if (!currentUser) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -81,7 +80,7 @@ export async function DELETE(
     return Response.json({ error: "Invalid id" }, { status: 400 });
   }
 
-  const wasDeleted = await ContactService.delete(contactId, session.user.id);
+  const wasDeleted = await ContactService.delete(contactId, currentUser.id);
   if (!wasDeleted) {
     return Response.json({ error: "Not found" }, { status: 404 });
   }

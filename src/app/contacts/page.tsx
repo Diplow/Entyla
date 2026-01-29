@@ -1,12 +1,13 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { getSession } from "~/server/better-auth";
+import { IamService } from "~/lib/domains";
 import { ContactsPageContent } from "~/app/contacts/_components/ContactsPageContent";
 
 export default async function ContactsPage() {
-  const session = await getSession();
+  const currentUser = await IamService.getCurrentUser(await headers());
 
-  if (!session) {
+  if (!currentUser) {
     redirect("/");
   }
 
