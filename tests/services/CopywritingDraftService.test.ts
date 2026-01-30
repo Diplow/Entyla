@@ -39,6 +39,7 @@ const baseRequest: DraftRequest = {
 function makeTextResponse(text: string) {
   return {
     content: [{ type: "text", text }],
+    usage: { input_tokens: 10, output_tokens: 20 },
   };
 }
 
@@ -236,6 +237,7 @@ describe("CopywritingDraftService.generateDraft", () => {
     it("extracts text from first text block", async () => {
       mockCreate.mockResolvedValue({
         content: [{ type: "text", text: "Generated message" }],
+        usage: { input_tokens: 10, output_tokens: 20 },
       });
 
       const draftResult = await repository.generateDraft(baseRequest);
@@ -246,6 +248,7 @@ describe("CopywritingDraftService.generateDraft", () => {
     it("returns empty string when no text blocks", async () => {
       mockCreate.mockResolvedValue({
         content: [],
+        usage: { input_tokens: 10, output_tokens: 0 },
       });
 
       const draftResult = await repository.generateDraft(baseRequest);
@@ -259,6 +262,7 @@ describe("CopywritingDraftService.generateDraft", () => {
           { type: "text", text: "First block" },
           { type: "text", text: "Second block" },
         ],
+        usage: { input_tokens: 10, output_tokens: 20 },
       });
 
       const draftResult = await repository.generateDraft(baseRequest);
@@ -269,6 +273,7 @@ describe("CopywritingDraftService.generateDraft", () => {
     it("returns empty string when only non-text blocks", async () => {
       mockCreate.mockResolvedValue({
         content: [{ type: "tool_use", id: "123", name: "tool", input: {} }],
+        usage: { input_tokens: 10, output_tokens: 5 },
       });
 
       const draftResult = await repository.generateDraft(baseRequest);

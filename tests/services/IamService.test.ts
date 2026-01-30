@@ -1,6 +1,25 @@
 import { describe, it, expect, vi } from "vitest";
 import { getTestInstance } from "better-auth/test";
 
+// --- Mock environment (prevents env validation from failing) ---
+
+vi.mock("~/env", () => ({
+  env: {
+    DATABASE_URL: "postgres://test:test@localhost:5432/test",
+    ANTHROPIC_API_KEY: "test-key",
+    BETTER_AUTH_GOOGLE_CLIENT_ID: "test-client-id",
+    BETTER_AUTH_GOOGLE_CLIENT_SECRET: "test-client-secret",
+    NODE_ENV: "test",
+  },
+}));
+
+// --- Mock database (prevents real DB connection) ---
+
+vi.mock("~/server/db", () => ({
+  db: {},
+  creditBalance: {},
+}));
+
 // --- Create test auth instance (in-memory SQLite) ---
 
 const testInstancePromise = getTestInstance(

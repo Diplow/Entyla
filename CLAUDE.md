@@ -4,6 +4,18 @@ Always use `model: "opus"` when spawning Task subagents.
 
 Never run `pnpm dev` — the user runs it. Ask the user to check dev server output when needed.
 
+## Feedback Commands
+
+Run these after implementation to validate changes:
+
+```
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm check:architecture
+pnpm check:ruleof6
+```
+
 ## Rule of 6
 
 The codebase follows the **Rule of 6** for consistent organization (enforced by `pnpm check:ruleof6`):
