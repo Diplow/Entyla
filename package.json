@@ -20,9 +20,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check:architecture": "python3 -m scripts.checks.architecture.main",
-    "check:ruleof6": "python3 -m scripts.checks.architecture.ruleof6.main",
-    "subsystem-tree": "python3 -m scripts.checks.architecture.tree.main"
+    "check:architecture": "python3.10 -m scripts.checks.architecture.main",
+    "check:ruleof6": "python3.10 -m scripts.checks.architecture.ruleof6.main",
+    "subsystem-tree": "python3.10 -m scripts.checks.architecture.tree.main"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.1",
