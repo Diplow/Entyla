@@ -2,5 +2,5 @@
   "type": "app",
   "allowed": ["~/lib/domains/iam", "~/lib/auth-client"],
   "allowedChildren": ["react", "next"],
-  "subsystems": ["./api", "./contacts"]
+  "subsystems": ["./api", "./contacts", "./messaging"]
 }

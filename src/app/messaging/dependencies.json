@@ -1,0 +1,4 @@
+{
+  "type": "page",
+  "allowed": ["~/lib/domains/iam"]
+}

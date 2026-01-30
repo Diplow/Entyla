@@ -127,3 +127,53 @@ export const contact = createTable(
   }),
   (t) => [index("contact_owner_idx").on(t.ownerId)],
 );
+
+export const conversation = createTable(
+  "conversation",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    contactId: d
+      .integer()
+      .notNull()
+      .references(() => contact.id),
+    ownerId: d
+      .varchar({ length: 255 })
+      .notNull()
+      .references(() => user.id),
+    sellingContext: d.text().notNull(),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+  }),
+  (t) => [index("conversation_owner_idx").on(t.ownerId)],
+);
+
+export const message = createTable(
+  "message",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    conversationId: d
+      .integer()
+      .notNull()
+      .references(() => conversation.id, { onDelete: "cascade" }),
+    role: d.varchar({ length: 20 }).notNull(),
+    content: d.text().notNull(),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+  }),
+  (t) => [index("message_conversation_idx").on(t.conversationId)],
+);
+
+export const conversationRelations = relations(conversation, ({ one, many }) => ({
+  contact: one(contact, { fields: [conversation.contactId], references: [contact.id] }),
+  owner: one(user, { fields: [conversation.ownerId], references: [user.id] }),
+  messages: many(message),
+}));
+
+export const messageRelations = relations(message, ({ one }) => ({
+  conversation: one(conversation, { fields: [message.conversationId], references: [conversation.id] }),
+}));

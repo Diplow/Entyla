@@ -1,0 +1,107 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+interface Contact {
+  id: number;
+  firstName: string;
+  lastName: string;
+  company: string | null;
+}
+
+interface Conversation {
+  id: number;
+  contactId: number;
+  sellingContext: string;
+  createdAt: string;
+}
+
+interface ConversationSetupProps {
+  onConversationCreated: (conversation: Conversation) => void;
+}
+
+export function ConversationSetup({ onConversationCreated }: ConversationSetupProps) {
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [selectedContactId, setSelectedContactId] = useState<number | "">("");
+  const [sellingContext, setSellingContext] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingContacts, setIsLoadingContacts] = useState(true);
+
+  useEffect(() => {
+    async function fetchContacts() {
+      try {
+        const response = await fetch("/api/contacts");
+        if (response.ok) setContacts((await response.json()) as Contact[]);
+      } catch {
+        // Silently fail
+      } finally {
+        setIsLoadingContacts(false);
+      }
+    }
+    void fetchContacts();
+  }, []);
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!selectedContactId || !sellingContext.trim()) return;
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contactId: selectedContactId, sellingContext }),
+      });
+      if (!response.ok) throw new Error("Failed to create conversation");
+      const data = (await response.json()) as { conversation: Conversation };
+      onConversationCreated(data.conversation);
+    } catch {
+      alert("Failed to create conversation. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  if (isLoadingContacts) return <p className="text-white/50">Loading contacts...</p>;
+  if (contacts.length === 0) return <p className="text-white/50">No contacts yet. Add contacts first.</p>;
+
+  return (
+    <form onSubmit={handleSubmit} className="flex w-full max-w-md flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        <label htmlFor="contact-select" className="text-sm font-medium">Contact</label>
+        <select
+          id="contact-select"
+          value={selectedContactId}
+          onChange={(event) => setSelectedContactId(Number(event.target.value) || "")}
+          className="rounded-lg bg-white/10 px-4 py-2 text-white"
+          required
+        >
+          <option value="">Select a contact...</option>
+          {contacts.map((contact) => (
+            <option key={contact.id} value={contact.id}>
+              {contact.firstName} {contact.lastName}{contact.company ? ` (${contact.company})` : ""}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="flex flex-col gap-2">
+        <label htmlFor="selling-context" className="text-sm font-medium">Selling Context</label>
+        <textarea
+          id="selling-context"
+          value={sellingContext}
+          onChange={(event) => setSellingContext(event.target.value)}
+          placeholder="Describe what you're selling and why this contact would be interested..."
+          className="rounded-lg bg-white/10 px-4 py-2 text-white placeholder:text-white/30"
+          rows={4}
+          required
+        />
+      </div>
+      <button
+        type="submit"
+        disabled={isLoading || !selectedContactId || !sellingContext.trim()}
+        className="rounded-lg bg-purple-600 px-4 py-2 font-medium transition hover:bg-purple-500 disabled:opacity-50"
+      >
+        {isLoading ? "Generating First Message..." : "Generate First Message"}
+      </button>
+    </form>
+  );
+}

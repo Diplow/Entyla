@@ -1,5 +1,5 @@
 {
   "type": "router",
-  "allowed": ["~/lib/domains/iam", "~/lib/domains/prospect", "zod"],
+  "allowed": ["~/lib/domains/iam", "~/lib/domains/prospect", "~/lib/domains/messaging", "zod"],
   "subsystems": ["./auth"]
 }

@@ -25,6 +25,7 @@
     "subsystem-tree": "python3 -m scripts.checks.architecture.tree.main"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.72.1",
     "@auth/drizzle-adapter": "^1.7.2",
     "@t3-oss/env-nextjs": "^0.12.0",
     "better-auth": "^1.3",

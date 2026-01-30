@@ -1,0 +1,55 @@
+import Anthropic from "@anthropic-ai/sdk";
+import { env } from "~/env";
+import type { CopywriterRepository } from "../CopywriterRepository";
+import type { DraftRequest, DraftResult } from "../../objects";
+
+function buildSystemPrompt(request: DraftRequest): string {
+  const { contactInfo, sellingContext } = request;
+  const contactName = `${contactInfo.firstName} ${contactInfo.lastName}`;
+  const contactDetails = [
+    contactInfo.jobTitle && `Job title: ${contactInfo.jobTitle}`,
+    contactInfo.company && `Company: ${contactInfo.company}`,
+  ].filter(Boolean).join("\n");
+
+  return [
+    "You are a professional sales copywriter. Write concise, natural prospection messages.",
+    `Contact: ${contactName}`,
+    contactDetails,
+    `Selling context: ${sellingContext}`,
+    "Write a short, personalized message. Be direct and professional, not pushy.",
+  ].join("\n");
+}
+
+function buildMessages(request: DraftRequest): Anthropic.MessageParam[] {
+  const { conversationHistory } = request;
+  if (conversationHistory.length === 0) {
+    return [{ role: "user", content: "Write the initial prospection message." }];
+  }
+
+  const messages: Anthropic.MessageParam[] = conversationHistory.map((message) => ({
+    role: message.role === "prospect" ? "assistant" as const : "user" as const,
+    content: message.content,
+  }));
+  messages.push({ role: "user", content: "Write a follow-up reply to continue the conversation." });
+  return messages;
+}
+
+export class AnthropicCopywriterRepository implements CopywriterRepository {
+  private client: Anthropic;
+
+  constructor() {
+    this.client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+  }
+
+  async generateDraft(request: DraftRequest): Promise<DraftResult> {
+    const response = await this.client.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1024,
+      system: buildSystemPrompt(request),
+      messages: buildMessages(request),
+    });
+
+    const textBlock = response.content.find((block) => block.type === "text");
+    return { content: textBlock?.text ?? "" };
+  }
+}
