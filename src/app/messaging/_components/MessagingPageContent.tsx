@@ -13,7 +13,8 @@ interface Conversation {
 }
 
 export function MessagingPageContent() {
-  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [activeConversation, setActiveConversation] =
+    useState<Conversation | null>(null);
 
   function handleConversationCreated(conversation: Conversation) {
     setActiveConversation(conversation);
@@ -32,5 +33,7 @@ export function MessagingPageContent() {
     );
   }
 
-  return <ConversationSetup onConversationCreated={handleConversationCreated} />;
+  return (
+    <ConversationSetup onConversationCreated={handleConversationCreated} />
+  );
 }

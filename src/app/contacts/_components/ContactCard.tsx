@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import posthog from "posthog-js";
 
 interface Contact {
   id: number;
@@ -25,6 +26,9 @@ export function ContactCard({ contact, onDeleted }: ContactCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDelete() {
+    posthog.capture("contact_delete_clicked", {
+      contact_id: contact.id,
+    });
     setIsDeleting(true);
     try {
       const response = await fetch(`/api/contacts/${contact.id}`, {
@@ -34,7 +38,8 @@ export function ContactCard({ contact, onDeleted }: ContactCardProps) {
         throw new Error("Failed to delete contact");
       }
       onDeleted();
-    } catch {
+    } catch (error) {
+      posthog.captureException(error);
       setIsDeleting(false);
       alert("Failed to delete contact. Please try again.");
     }
@@ -60,9 +65,7 @@ export function ContactCard({ contact, onDeleted }: ContactCardProps) {
             <p className="text-sm text-white/70">{contact.phone}</p>
           )}
           {contact.notes && (
-            <p className="mt-2 text-sm text-white/50 italic">
-              {contact.notes}
-            </p>
+            <p className="mt-2 text-sm text-white/50 italic">{contact.notes}</p>
           )}
         </div>
         <button

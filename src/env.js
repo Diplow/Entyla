@@ -28,7 +28,8 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
+    NEXT_PUBLIC_POSTHOG_HOST: z.string().url().optional(),
   },
 
   /**
@@ -44,6 +45,8 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     POSTHOG_KEY: process.env.POSTHOG_KEY,
+    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+    NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     NODE_ENV: process.env.NODE_ENV,
   },
   /**

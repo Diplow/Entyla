@@ -18,7 +18,10 @@ interface ConversationThreadProps {
   onBack: () => void;
 }
 
-export function ConversationThread({ conversationId, onBack }: ConversationThreadProps) {
+export function ConversationThread({
+  conversationId,
+  onBack,
+}: ConversationThreadProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -26,7 +29,9 @@ export function ConversationThread({ conversationId, onBack }: ConversationThrea
   useEffect(() => {
     async function fetchMessages() {
       try {
-        const response = await fetch(`/api/conversations/${conversationId}/messages`);
+        const response = await fetch(
+          `/api/conversations/${conversationId}/messages`,
+        );
         if (response.ok) {
           const messagesData = (await response.json()) as Message[];
           setMessages(messagesData);
@@ -41,11 +46,14 @@ export function ConversationThread({ conversationId, onBack }: ConversationThrea
   }, [conversationId]);
 
   async function handleContactResponse(content: string) {
-    const response = await fetch(`/api/conversations/${conversationId}/messages`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ role: "contact", content }),
-    });
+    const response = await fetch(
+      `/api/conversations/${conversationId}/messages`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: "contact", content }),
+      },
+    );
 
     if (!response.ok) throw new Error("Failed to send response");
 
@@ -56,15 +64,20 @@ export function ConversationThread({ conversationId, onBack }: ConversationThrea
   async function handleGenerateReply() {
     setIsGenerating(true);
     try {
-      const response = await fetch(`/api/conversations/${conversationId}/messages`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: "prospect" }),
-      });
+      const response = await fetch(
+        `/api/conversations/${conversationId}/messages`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role: "prospect" }),
+        },
+      );
 
       if (!response.ok) throw new Error("Failed to generate reply");
 
-      const refreshResponse = await fetch(`/api/conversations/${conversationId}/messages`);
+      const refreshResponse = await fetch(
+        `/api/conversations/${conversationId}/messages`,
+      );
       if (refreshResponse.ok) {
         const messagesData = (await refreshResponse.json()) as Message[];
         setMessages(messagesData);

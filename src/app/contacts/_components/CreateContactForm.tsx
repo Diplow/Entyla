@@ -2,19 +2,27 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
+import posthog from "posthog-js";
 
 import { ContactFormFields } from "~/app/contacts/_components/ContactFormFields";
 
 const EMPTY_FORM = {
-  firstName: "", lastName: "", email: "",
-  company: "", jobTitle: "", phone: "", notes: "",
+  firstName: "",
+  lastName: "",
+  email: "",
+  company: "",
+  jobTitle: "",
+  phone: "",
+  notes: "",
 };
 
 interface CreateContactFormProps {
   onContactCreated: () => void;
 }
 
-export function CreateContactForm({ onContactCreated }: CreateContactFormProps) {
+export function CreateContactForm({
+  onContactCreated,
+}: CreateContactFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -48,21 +56,35 @@ export function CreateContactForm({ onContactCreated }: CreateContactFormProps) 
         throw new Error("Failed to create contact");
       }
 
+      posthog.capture("contact_created", {
+        has_email: Boolean(formData.email),
+        has_company: Boolean(formData.company),
+        has_job_title: Boolean(formData.jobTitle),
+        has_phone: Boolean(formData.phone),
+        has_notes: Boolean(formData.notes),
+      });
+
       setFormData(EMPTY_FORM);
       setErrorMessage(null);
       setIsOpen(false);
       onContactCreated();
-    } catch {
+    } catch (error) {
+      posthog.captureException(error);
       setErrorMessage("Failed to create contact. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   }
 
+  function handleOpenForm() {
+    posthog.capture("contact_form_opened");
+    setIsOpen(true);
+  }
+
   if (!isOpen) {
     return (
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={handleOpenForm}
         className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
       >
         New Contact
@@ -71,18 +93,32 @@ export function CreateContactForm({ onContactCreated }: CreateContactFormProps) 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md rounded-xl bg-white/10 p-6">
+    <form
+      onSubmit={handleSubmit}
+      className="w-full max-w-md rounded-xl bg-white/10 p-6"
+    >
       <h2 className="mb-4 text-xl font-bold">New Contact</h2>
-      {errorMessage && <p className="mb-4 text-sm text-red-400">{errorMessage}</p>}
+      {errorMessage && (
+        <p className="mb-4 text-sm text-red-400">{errorMessage}</p>
+      )}
       <ContactFormFields formData={formData} onChange={handleFieldChange} />
       <div className="mt-4 flex gap-3">
-        <button type="submit" disabled={isSubmitting}
-          className="rounded-full bg-white/20 px-6 py-2 font-semibold transition hover:bg-white/30 disabled:opacity-50">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="rounded-full bg-white/20 px-6 py-2 font-semibold transition hover:bg-white/30 disabled:opacity-50"
+        >
           {isSubmitting ? "Creating..." : "Create"}
         </button>
-        <button type="button"
-          onClick={() => { setFormData(EMPTY_FORM); setErrorMessage(null); setIsOpen(false); }}
-          className="rounded-full bg-white/10 px-6 py-2 font-semibold transition hover:bg-white/20">
+        <button
+          type="button"
+          onClick={() => {
+            setFormData(EMPTY_FORM);
+            setErrorMessage(null);
+            setIsOpen(false);
+          }}
+          className="rounded-full bg-white/10 px-6 py-2 font-semibold transition hover:bg-white/20"
+        >
           Cancel
         </button>
       </div>

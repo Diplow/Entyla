@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import posthog from "posthog-js";
 
 interface Contact {
   id: number;
@@ -20,7 +21,9 @@ interface ConversationSetupProps {
   onConversationCreated: (conversation: Conversation) => void;
 }
 
-export function ConversationSetup({ onConversationCreated }: ConversationSetupProps) {
+export function ConversationSetup({
+  onConversationCreated,
+}: ConversationSetupProps) {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedContactId, setSelectedContactId] = useState<number | "">("");
   const [sellingContext, setSellingContext] = useState("");
@@ -53,38 +56,59 @@ export function ConversationSetup({ onConversationCreated }: ConversationSetupPr
       });
       if (!response.ok) throw new Error("Failed to create conversation");
       const data = (await response.json()) as { conversation: Conversation };
+
+      posthog.capture("conversation_started", {
+        contact_id: selectedContactId,
+        selling_context_length: sellingContext.trim().length,
+      });
+
       onConversationCreated(data.conversation);
-    } catch {
+    } catch (error) {
+      posthog.captureException(error);
       alert("Failed to create conversation. Please try again.");
     } finally {
       setIsLoading(false);
     }
   }
 
-  if (isLoadingContacts) return <p className="text-white/50">Loading contacts...</p>;
-  if (contacts.length === 0) return <p className="text-white/50">No contacts yet. Add contacts first.</p>;
+  if (isLoadingContacts)
+    return <p className="text-white/50">Loading contacts...</p>;
+  if (contacts.length === 0)
+    return (
+      <p className="text-white/50">No contacts yet. Add contacts first.</p>
+    );
 
   return (
-    <form onSubmit={handleSubmit} className="flex w-full max-w-md flex-col gap-4">
+    <form
+      onSubmit={handleSubmit}
+      className="flex w-full max-w-md flex-col gap-4"
+    >
       <div className="flex flex-col gap-2">
-        <label htmlFor="contact-select" className="text-sm font-medium">Contact</label>
+        <label htmlFor="contact-select" className="text-sm font-medium">
+          Contact
+        </label>
         <select
           id="contact-select"
           value={selectedContactId}
-          onChange={(event) => setSelectedContactId(Number(event.target.value) || "")}
+          onChange={(event) =>
+            setSelectedContactId(Number(event.target.value) || "")
+          }
           className="rounded-lg bg-white/10 px-4 py-2 text-white"
           required
         >
           <option value="">Select a contact...</option>
           {contacts.map((contact) => (
             <option key={contact.id} value={contact.id}>
-              {contact.firstName} {contact.lastName}{contact.company ? ` (${contact.company})` : ""}
+              {contact.firstName} {contact.lastName}
+              {contact.company ? ` (${contact.company})` : ""}
             </option>
           ))}
         </select>
       </div>
       <div className="flex flex-col gap-2">
-        <label htmlFor="selling-context" className="text-sm font-medium">Selling Context</label>
+        <label htmlFor="selling-context" className="text-sm font-medium">
+          Selling Context
+        </label>
         <textarea
           id="selling-context"
           value={sellingContext}

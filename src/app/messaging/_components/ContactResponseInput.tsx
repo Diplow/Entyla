@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import posthog from "posthog-js";
 
 interface ContactResponseInputProps {
   onSubmit: (content: string) => Promise<void>;
@@ -23,12 +24,21 @@ export function ContactResponseInput({
     setIsSending(true);
     try {
       await onSubmit(content.trim());
+      posthog.capture("contact_response_sent", {
+        response_length: content.trim().length,
+      });
       setContent("");
-    } catch {
+    } catch (error) {
+      posthog.captureException(error);
       alert("Failed to send response. Please try again.");
     } finally {
       setIsSending(false);
     }
+  }
+
+  async function handleGenerateReply() {
+    posthog.capture("ai_reply_requested");
+    await onGenerateReply();
   }
 
   return (
@@ -52,7 +62,7 @@ export function ContactResponseInput({
       </form>
 
       <button
-        onClick={onGenerateReply}
+        onClick={handleGenerateReply}
         disabled={isGenerating}
         className="rounded-lg bg-purple-600 px-4 py-2 font-medium transition hover:bg-purple-500 disabled:opacity-50"
       >

@@ -18,15 +18,13 @@ export function MessageBubble({ message }: MessageBubbleProps) {
     <div className={`flex ${isProspect ? "justify-end" : "justify-start"}`}>
       <div
         className={`max-w-[80%] rounded-xl px-4 py-3 ${
-          isProspect
-            ? "bg-purple-600 text-white"
-            : "bg-white/10 text-white"
+          isProspect ? "bg-purple-600 text-white" : "bg-white/10 text-white"
         }`}
       >
-        <p className="text-xs font-medium opacity-70 mb-1">
+        <p className="mb-1 text-xs font-medium opacity-70">
           {isProspect ? "You (Prospect)" : "Contact"}
         </p>
-        <p className="whitespace-pre-wrap text-sm">{message.content}</p>
+        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
       </div>
     </div>
   );
