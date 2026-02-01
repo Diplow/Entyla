@@ -36,15 +36,27 @@ export class DrizzleCreditRepository implements CreditRepository {
     return rows[0]!;
   }
 
-  async deductCredits(balanceId: number, cost: number): Promise<number> {
+  async tryDeductCredits(
+    balanceId: number,
+    cost: number,
+  ): Promise<{ deducted: true; remainingCredits: number } | { deducted: false }> {
     const rows = await db
       .update(creditBalance)
       .set({
         remainingCredits: sql`${creditBalance.remainingCredits} - ${cost}`,
       })
-      .where(sql`${creditBalance.id} = ${balanceId}`)
+      .where(
+        and(
+          sql`${creditBalance.id} = ${balanceId}`,
+          gte(creditBalance.remainingCredits, cost),
+        ),
+      )
       .returning({ remainingCredits: creditBalance.remainingCredits });
 
-    return rows[0]!.remainingCredits;
+    if (rows.length === 0) {
+      return { deducted: false };
+    }
+
+    return { deducted: true, remainingCredits: rows[0]!.remainingCredits };
   }
 }
