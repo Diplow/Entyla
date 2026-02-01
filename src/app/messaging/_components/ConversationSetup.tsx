@@ -10,22 +10,24 @@ interface Contact {
   company: string | null;
 }
 
-interface Conversation {
+interface ConversationContact {
+  firstName: string;
+  lastName: string;
+  company: string | null;
+}
+
+interface EnrichedConversation {
   id: number;
   contactId: number;
   sellingContext: string;
   createdAt: string;
-}
-
-interface ExistingConversation {
-  id: number;
-  contactId: number;
+  contact: ConversationContact | null;
 }
 
 interface ConversationSetupProps {
-  onConversationCreated: (conversation: Conversation) => void;
+  onConversationCreated: (conversationId: number) => void;
   onBack: () => void;
-  existingConversations: ExistingConversation[];
+  existingConversations: EnrichedConversation[];
 }
 
 export function ConversationSetup({
@@ -69,14 +71,14 @@ export function ConversationSetup({
         body: JSON.stringify({ contactId: selectedContactId, sellingContext }),
       });
       if (!response.ok) throw new Error("Failed to create conversation");
-      const data = (await response.json()) as { conversation: Conversation };
+      const conversationResponse = (await response.json()) as { conversation: { id: number } };
 
       posthog.capture("conversation_started", {
         contact_id: selectedContactId,
         selling_context_length: sellingContext.trim().length,
       });
 
-      onConversationCreated(data.conversation);
+      onConversationCreated(conversationResponse.conversation.id);
     } catch (error) {
       posthog.captureException(error);
       alert("Failed to create conversation. Please try again.");
@@ -133,7 +135,7 @@ export function ConversationSetup({
             <p>A conversation already exists with this contact.</p>
             <button
               type="button"
-              onClick={() => onConversationCreated(matchingConversation as Conversation)}
+              onClick={() => onConversationCreated(matchingConversation.id)}
               className="mt-2 font-medium text-yellow-100 underline transition hover:text-white"
             >
               Open existing conversation

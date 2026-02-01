@@ -40,7 +40,6 @@ function UserAvatar({ userName, userImage }: { userName: string; userImage: stri
       {displayInitials}
     </div>
   );
-  );
 }
 
 export function Header({ userName, userImage, remainingCredits }: HeaderProps) {

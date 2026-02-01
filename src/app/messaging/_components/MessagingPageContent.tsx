@@ -53,8 +53,8 @@ export function MessagingPageContent() {
     setCurrentView("setup");
   }
 
-  function handleConversationCreated(conversation: { id: number }) {
-    setActiveConversationId(conversation.id);
+  function handleConversationCreated(conversationId: number) {
+    setActiveConversationId(conversationId);
     setCurrentView("thread");
   }
 
