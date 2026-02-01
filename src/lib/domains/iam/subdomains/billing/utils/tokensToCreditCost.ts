@@ -1,7 +1,7 @@
 const MICROCENTS_PER_DOLLAR = 10_000;
 
 const MODEL_PRICING: Record<string, { inputPerMillion: number; outputPerMillion: number }> = {
-  "claude-sonnet-4-20250514": { inputPerMillion: 3, outputPerMillion: 15 },
+  "claude-sonnet-4-5-20250929": { inputPerMillion: 3, outputPerMillion: 15 },
   "claude-haiku-3-5-20241022": { inputPerMillion: 0.80, outputPerMillion: 4 },
 };
 

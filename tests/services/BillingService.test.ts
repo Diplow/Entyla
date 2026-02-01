@@ -32,7 +32,7 @@ const { tokensToCreditCost } = await import(
 const USER_A = "user-billing-a";
 const USER_B = "user-billing-b";
 
-const SONNET_MODEL = "claude-sonnet-4-20250514";
+const SONNET_MODEL = "claude-sonnet-4-5-20250929";
 const HAIKU_MODEL = "claude-haiku-3-5-20241022";
 const UNKNOWN_MODEL = "some-unknown-model";
 
