@@ -7,6 +7,7 @@ import {
   pgTableCreator,
   text,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const createTable = pgTableCreator((name) => `pg-drizzle_${name}`);
@@ -188,6 +189,7 @@ export const creditBalance = createTable(
   }),
   (t) => [
     index("credit_balance_user_idx").on(t.userId),
+    uniqueIndex("pg-drizzle_credit_balance_user_period_uniq").on(t.userId, t.periodStart, t.periodEnd),
   ],
 );
 

@@ -8,7 +8,7 @@ Never run `pnpm dev` — the user runs it. Ask the user to check dev server outp
 
 Run these after implementation to validate changes:
 
-```
+```bash
 pnpm lint
 pnpm typecheck
 pnpm test
@@ -80,5 +80,6 @@ Use `/plan-feature <description>` to plan features using this architecture.
 ## Product Context
 
 Sales prospection platform that helps sales teams automate their prospection workflow. Core concepts:
+
 - **Prospects**: Potential customers being tracked
 - **Contacts**: Individual people within prospect organizations

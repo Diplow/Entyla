@@ -8,4 +8,5 @@ CREATE TABLE "pg-drizzle_credit_balance" (
 );
 --> statement-breakpoint
 ALTER TABLE "pg-drizzle_credit_balance" ADD CONSTRAINT "pg-drizzle_credit_balance_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "credit_balance_user_idx" ON "pg-drizzle_credit_balance" USING btree ("userId");
+CREATE INDEX "credit_balance_user_idx" ON "pg-drizzle_credit_balance" USING btree ("userId");--> statement-breakpoint
+ALTER TABLE "pg-drizzle_credit_balance" ADD CONSTRAINT "pg-drizzle_credit_balance_user_period_uniq" UNIQUE ("userId", "periodStart", "periodEnd");
