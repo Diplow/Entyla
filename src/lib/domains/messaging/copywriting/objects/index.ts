@@ -3,4 +3,5 @@ export type {
   ConversationMessage,
   DraftRequest,
   DraftResult,
+  TokenUsage,
 } from "./DraftTypes";

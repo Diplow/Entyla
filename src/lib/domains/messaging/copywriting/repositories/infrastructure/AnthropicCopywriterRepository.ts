@@ -42,14 +42,22 @@ export class AnthropicCopywriterRepository implements CopywriterRepository {
   }
 
   async generateDraft(request: DraftRequest): Promise<DraftResult> {
+    const modelId = "claude-sonnet-4-20250514";
     const response = await this.client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: modelId,
       max_tokens: 1024,
       system: buildSystemPrompt(request),
       messages: buildMessages(request),
     });
 
     const textBlock = response.content.find((block) => block.type === "text");
-    return { content: textBlock?.text ?? "" };
+    return {
+      content: textBlock?.text ?? "",
+      usage: {
+        inputTokens: response.usage.input_tokens,
+        outputTokens: response.usage.output_tokens,
+        model: modelId,
+      },
+    };
   }
 }

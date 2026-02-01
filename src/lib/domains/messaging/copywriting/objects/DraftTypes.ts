@@ -16,6 +16,13 @@ export interface DraftRequest {
   conversationHistory: ConversationMessage[];
 }
 
+export interface TokenUsage {
+  inputTokens: number;
+  outputTokens: number;
+  model: string;
+}
+
 export interface DraftResult {
   content: string;
+  usage: TokenUsage;
 }

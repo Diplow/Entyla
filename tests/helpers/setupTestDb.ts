@@ -18,6 +18,7 @@ export async function initializeTestDb() {
 
 export async function cleanTestDb() {
   await pgliteInstance.exec(`
+    TRUNCATE "pg-drizzle_credit_balance" CASCADE;
     TRUNCATE "pg-drizzle_contact" CASCADE;
     TRUNCATE "user" CASCADE;
   `);

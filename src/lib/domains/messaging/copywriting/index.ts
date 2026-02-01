@@ -1,2 +1,2 @@
 export { DraftService } from "./services";
-export type { DraftRequest, DraftResult, ContactInfo, ConversationMessage } from "./objects";
+export type { DraftRequest, DraftResult, TokenUsage, ContactInfo, ConversationMessage } from "./objects";
