@@ -28,11 +28,18 @@ function UserAvatar({ userName, userImage }: { userName: string; userImage: stri
     .join("")
     .toUpperCase()
     .slice(0, 2);
+  const displayInitials = initials || "?";
 
   return (
-    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-600 text-sm font-medium">
-      {initials}
+    <div
+      className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-600 text-sm font-medium"
+      role="img"
+      aria-label={`Avatar for ${userName || "user"}`}
+      title={userName}
+    >
+      {displayInitials}
     </div>
+  );
   );
 }
 
