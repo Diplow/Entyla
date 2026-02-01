@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "pg-drizzle_credit_balance_user_period_uniq" ON "pg-drizzle_credit_balance" USING btree ("userId","periodStart","periodEnd");
