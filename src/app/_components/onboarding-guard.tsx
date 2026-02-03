@@ -22,11 +22,18 @@ export function OnboardingGuard({ children }: { children: React.ReactNode }) {
   const [shouldRedirect, setShouldRedirect] = useState(false);
 
   useEffect(() => {
+    // Reset guard state when path changes to avoid flashing gated content
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (isExcludedPath) {
       setIsChecking(false);
       setShouldRedirect(false);
       return;
     }
+
+    // Reset state when a non-excluded path begins a new check
+    setIsChecking(true);
+    setShouldRedirect(false);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     async function checkOnboardingStatus() {
       try {

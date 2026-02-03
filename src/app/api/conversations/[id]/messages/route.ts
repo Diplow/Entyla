@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { IamService, getEffectiveToneOfVoice } from "~/lib/domains/iam";
+import { IamService, getEffectiveToneOfVoice, DEFAULT_TONE_OF_VOICE } from "~/lib/domains/iam";
 import { ContactService } from "~/lib/domains/prospect";
 import { ConversationService } from "~/lib/domains/messaging";
 import type { ContactInfo, ConversationMessage, UserAiContext } from "~/lib/domains/messaging";
@@ -127,7 +127,7 @@ async function handleCreateMessage(
   const aiPreferences = await IamService.getAiPreferences(currentUser.id);
   const userAiContext: UserAiContext = {
     companyKnowledge: aiPreferences?.companyKnowledge ?? "",
-    toneOfVoice: aiPreferences ? getEffectiveToneOfVoice(aiPreferences) : "",
+    toneOfVoice: aiPreferences ? getEffectiveToneOfVoice(aiPreferences) : DEFAULT_TONE_OF_VOICE,
     exampleMessages: aiPreferences?.exampleMessages ?? [],
   };
 

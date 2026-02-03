@@ -3,6 +3,7 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   pgTable,
   pgTableCreator,
   text,
@@ -205,24 +206,24 @@ export const messageRelations = relations(message, ({ one }) => ({
 
 export const aiPreferences = createTable(
   "ai_preferences",
-  (d) => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    userId: d
+  (col) => ({
+    id: col.integer().primaryKey().generatedByDefaultAsIdentity(),
+    userId: col
       .varchar({ length: 255 })
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    companyKnowledge: d.text(),
-    toneOfVoice: d.text(),
-    exampleMessages: d.text(),
-    onboardingCompleted: d.integer().default(0).notNull(),
-    createdAt: d
+    companyKnowledge: col.text(),
+    toneOfVoice: col.text(),
+    exampleMessages: jsonb("example_messages").$type<string[]>(),
+    onboardingCompleted: col.integer().default(0).notNull(),
+    createdAt: col
       .timestamp({ withTimezone: true })
       .$defaultFn(() => new Date())
       .notNull(),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+    updatedAt: col.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
   }),
-  (t) => [
-    uniqueIndex("ai_preferences_user_idx").on(t.userId),
+  (table) => [
+    uniqueIndex("ai_preferences_user_idx").on(table.userId),
   ],
 );
 

@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-import { IamService, getEffectiveToneOfVoice } from "~/lib/domains/iam";
+import { IamService, getEffectiveToneOfVoice, DEFAULT_TONE_OF_VOICE } from "~/lib/domains/iam";
 import { withApiLogging } from "~/lib/logging";
 import { resolveSessionUserId } from "~/server/better-auth";
 
 const updatePreferencesSchema = z.object({
-  companyKnowledge: z.string().optional(),
-  toneOfVoice: z.string().optional(),
-  exampleMessages: z.array(z.string()).max(10).optional(),
+  companyKnowledge: z.string().nullable().optional(),
+  toneOfVoice: z.string().nullable().optional(),
+  exampleMessages: z.array(z.string()).max(10).nullable().optional(),
 });
 
 async function handleGetPreferences() {
@@ -21,7 +21,7 @@ async function handleGetPreferences() {
   if (!preferences) {
     return Response.json({
       companyKnowledge: null,
-      toneOfVoice: null,
+      toneOfVoice: DEFAULT_TONE_OF_VOICE,
       exampleMessages: [],
       onboardingCompleted: false,
     });
@@ -60,9 +60,16 @@ async function handleUpdatePreferences(request: Request) {
     );
   }
 
+  // Normalize null values to undefined for the service
+  const normalizedData = {
+    companyKnowledge: parseResult.data.companyKnowledge ?? undefined,
+    toneOfVoice: parseResult.data.toneOfVoice ?? undefined,
+    exampleMessages: parseResult.data.exampleMessages ?? undefined,
+  };
+
   const updatedPreferences = await IamService.updateAiPreferences(
     currentUser.id,
-    parseResult.data,
+    normalizedData,
   );
 
   return Response.json({
