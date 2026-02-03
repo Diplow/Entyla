@@ -202,3 +202,30 @@ export const conversationRelations = relations(conversation, ({ one, many }) => 
 export const messageRelations = relations(message, ({ one }) => ({
   conversation: one(conversation, { fields: [message.conversationId], references: [conversation.id] }),
 }));
+
+export const aiPreferences = createTable(
+  "ai_preferences",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    userId: d
+      .varchar({ length: 255 })
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    companyKnowledge: d.text(),
+    toneOfVoice: d.text(),
+    exampleMessages: d.text(),
+    onboardingCompleted: d.integer().default(0).notNull(),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+  }),
+  (t) => [
+    uniqueIndex("ai_preferences_user_idx").on(t.userId),
+  ],
+);
+
+export const aiPreferencesRelations = relations(aiPreferences, ({ one }) => ({
+  user: one(user, { fields: [aiPreferences.userId], references: [user.id] }),
+}));
