@@ -27,19 +27,24 @@ export function OnboardingWizard() {
 
   useEffect(() => {
     async function fetchPreferences() {
+      console.log("[OnboardingWizard] Fetching preferences...");
       try {
         const response = await fetch("/api/ai-preferences");
+        console.log("[OnboardingWizard] Response status:", response.status);
         if (!response.ok) {
           throw new Error("Failed to load preferences");
         }
         const preferences = (await response.json()) as AiPreferences;
+        console.log("[OnboardingWizard] Preferences loaded:", preferences);
 
         setCompanyKnowledge(preferences.companyKnowledge ?? "");
         setToneOfVoice(preferences.toneOfVoice ?? DEFAULT_TONE_OF_VOICE);
         setExampleMessages(preferences.exampleMessages ?? []);
-      } catch {
+      } catch (error) {
+        console.log("[OnboardingWizard] Error:", error);
         // Preferences may not exist yet for new users, which is fine
       } finally {
+        console.log("[OnboardingWizard] Setting isLoading to false");
         setIsLoading(false);
       }
     }

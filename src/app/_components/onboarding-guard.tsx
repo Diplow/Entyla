@@ -23,6 +23,8 @@ export function OnboardingGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isExcludedPath) {
+      setIsChecking(false);
+      setShouldRedirect(false);
       return;
     }
 
@@ -48,6 +50,11 @@ export function OnboardingGuard({ children }: { children: React.ReactNode }) {
 
     void checkOnboardingStatus();
   }, [isExcludedPath, router]);
+
+  // Always render children on excluded paths
+  if (isExcludedPath) {
+    return <>{children}</>;
+  }
 
   if (shouldRedirect) {
     return (

@@ -51,6 +51,7 @@ export class DrizzleAiPreferencesRepository implements AiPreferencesRepository {
         companyKnowledge: input.companyKnowledge ?? null,
         toneOfVoice: input.toneOfVoice ?? null,
         exampleMessages: exampleMessagesJson ?? null,
+        createdAt: new Date(),
       })
       .onConflictDoUpdate({
         target: aiPreferences.userId,
@@ -71,6 +72,7 @@ export class DrizzleAiPreferencesRepository implements AiPreferencesRepository {
       .values({
         userId,
         onboardingCompleted: 1,
+        createdAt: new Date(),
       })
       .onConflictDoUpdate({
         target: aiPreferences.userId,
