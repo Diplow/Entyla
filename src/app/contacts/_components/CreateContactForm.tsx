@@ -103,7 +103,8 @@ export function CreateContactForm({
         <button
           type="button"
           onClick={handleCancel}
-          className="rounded-full bg-white/10 px-6 py-2 font-semibold transition hover:bg-white/20"
+          disabled={isSubmitting}
+          className="rounded-full bg-white/10 px-6 py-2 font-semibold transition hover:bg-white/20 disabled:opacity-50"
         >
           Cancel
         </button>

@@ -15,7 +15,7 @@ const createCompanySchema = z.object({
 });
 
 const handlers = withApiLogging(
-  "/api/companies",
+  "/api/contacts/companies",
   {
     GET: async () => {
       const currentUser = await IamService.getCurrentUser();
@@ -33,7 +33,16 @@ const handlers = withApiLogging(
         return Response.json({ error: "Unauthorized" }, { status: 401 });
       }
 
-      const body: unknown = await request.json();
+      let body: unknown;
+      try {
+        body = await request.json();
+      } catch {
+        return Response.json(
+          { error: "Invalid JSON in request body" },
+          { status: 400 },
+        );
+      }
+
       const parseResult = createCompanySchema.safeParse(body);
       if (!parseResult.success) {
         return Response.json(

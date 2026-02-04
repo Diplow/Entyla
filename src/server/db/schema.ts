@@ -148,7 +148,7 @@ export const contact = createTable(
     notes: d.text(),
     linkedinProviderId: d.varchar({ length: 100 }),
     linkedinUrl: d.varchar({ length: 500 }),
-    companyId: d.integer().references(() => company.id),
+    companyId: d.integer().references(() => company.id, { onDelete: "set null" }),
     ownerId: d
       .varchar({ length: 255 })
       .notNull()

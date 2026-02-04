@@ -132,10 +132,12 @@ export function ImportFromLinkedIn({
           }),
         });
 
-        if (companyResponse.ok) {
-          const companyData = (await companyResponse.json()) as { id: number };
-          companyId = companyData.id;
+        if (!companyResponse.ok) {
+          throw new Error("Failed to create company");
         }
+
+        const companyData = (await companyResponse.json()) as { id: number };
+        companyId = companyData.id;
       }
 
       const contactResponse = await fetch("/api/contacts", {
@@ -164,7 +166,7 @@ export function ImportFromLinkedIn({
         has_email: Boolean(formData.email),
       });
 
-      resetForm();
+      resetFormState();
       onContactCreated();
     } catch (error) {
       posthog.captureException(error);
@@ -173,7 +175,7 @@ export function ImportFromLinkedIn({
     }
   }
 
-  function resetForm() {
+  function resetFormState() {
     setState("idle");
     setLinkedinUrl("");
     setPreviewData(null);
@@ -187,6 +189,10 @@ export function ImportFromLinkedIn({
     });
     setCreateCompany(true);
     setErrorMessage(null);
+  }
+
+  function handleCancel() {
+    resetFormState();
     onCancel?.();
   }
 
@@ -223,7 +229,7 @@ export function ImportFromLinkedIn({
           </button>
           <button
             type="button"
-            onClick={resetForm}
+            onClick={handleCancel}
             className="rounded-full bg-white/10 px-6 py-2 font-semibold transition hover:bg-white/20"
           >
             Cancel
@@ -365,7 +371,7 @@ export function ImportFromLinkedIn({
         </button>
         <button
           type="button"
-          onClick={resetForm}
+          onClick={handleCancel}
           className="rounded-full bg-white/10 px-6 py-2 font-semibold transition hover:bg-white/20"
         >
           Cancel

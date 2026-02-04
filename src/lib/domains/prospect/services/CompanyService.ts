@@ -1,4 +1,4 @@
-import { DrizzleCompanyRepository } from "../repositories";
+import type { CompanyRepository } from "../repositories";
 import {
   createCompany,
   getCompanyById,
@@ -9,23 +9,23 @@ import {
 } from "../actions";
 import type { CompanyCreateInput, CompanyUpdateInput } from "../objects";
 
-const companyRepository = new DrizzleCompanyRepository();
+export function createCompanyService(companyRepository: CompanyRepository) {
+  return {
+    create: (ownerId: string, input: CompanyCreateInput) =>
+      createCompany(companyRepository, ownerId, input),
 
-export const CompanyService = {
-  create: (ownerId: string, input: CompanyCreateInput) =>
-    createCompany(companyRepository, ownerId, input),
+    getById: (companyId: number, ownerId: string) =>
+      getCompanyById(companyRepository, companyId, ownerId),
 
-  getById: (companyId: number, ownerId: string) =>
-    getCompanyById(companyRepository, companyId, ownerId),
+    getByLinkedinProviderId: (linkedinProviderId: string, ownerId: string) =>
+      getCompanyByLinkedinProviderId(companyRepository, linkedinProviderId, ownerId),
 
-  getByLinkedinProviderId: (linkedinProviderId: string, ownerId: string) =>
-    getCompanyByLinkedinProviderId(companyRepository, linkedinProviderId, ownerId),
+    list: (ownerId: string) => listCompanies(companyRepository, ownerId),
 
-  list: (ownerId: string) => listCompanies(companyRepository, ownerId),
+    update: (companyId: number, ownerId: string, input: CompanyUpdateInput) =>
+      updateCompany(companyRepository, companyId, ownerId, input),
 
-  update: (companyId: number, ownerId: string, input: CompanyUpdateInput) =>
-    updateCompany(companyRepository, companyId, ownerId, input),
-
-  delete: (companyId: number, ownerId: string) =>
-    deleteCompany(companyRepository, companyId, ownerId),
-};
+    delete: (companyId: number, ownerId: string) =>
+      deleteCompany(companyRepository, companyId, ownerId),
+  };
+}

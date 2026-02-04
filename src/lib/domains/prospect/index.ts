@@ -1,7 +1,8 @@
 import {
   ContactService as _ContactService,
-  CompanyService as _CompanyService,
+  createCompanyService,
 } from "./services";
+import { DrizzleCompanyRepository } from "./repositories";
 import {
   LinkedInEnrichmentService as _LinkedInEnrichmentService,
   LinkedInEnrichmentError,
@@ -9,7 +10,13 @@ import {
 import { withLogging } from "~/lib/logging";
 
 export const ContactService = withLogging("ContactService", _ContactService);
-export const CompanyService = withLogging("CompanyService", _CompanyService);
+
+const companyRepository = new DrizzleCompanyRepository();
+export const CompanyService = withLogging(
+  "CompanyService",
+  createCompanyService(companyRepository),
+);
+
 export const LinkedInEnrichmentService = withLogging(
   "LinkedInEnrichmentService",
   _LinkedInEnrichmentService,

@@ -17,5 +17,5 @@ ALTER TABLE "pg-drizzle_contact" ADD COLUMN "companyId" integer;--> statement-br
 ALTER TABLE "pg-drizzle_company" ADD CONSTRAINT "pg-drizzle_company_ownerId_user_id_fk" FOREIGN KEY ("ownerId") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "company_owner_idx" ON "pg-drizzle_company" USING btree ("ownerId");--> statement-breakpoint
 CREATE UNIQUE INDEX "company_linkedin_provider_owner_idx" ON "pg-drizzle_company" USING btree ("linkedinProviderId","ownerId");--> statement-breakpoint
-ALTER TABLE "pg-drizzle_contact" ADD CONSTRAINT "pg-drizzle_contact_companyId_pg-drizzle_company_id_fk" FOREIGN KEY ("companyId") REFERENCES "public"."pg-drizzle_company"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "pg-drizzle_contact" ADD CONSTRAINT "pg-drizzle_contact_companyId_pg-drizzle_company_id_fk" FOREIGN KEY ("companyId") REFERENCES "public"."pg-drizzle_company"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 CREATE UNIQUE INDEX "contact_linkedin_provider_owner_idx" ON "pg-drizzle_contact" USING btree ("linkedinProviderId","ownerId");
