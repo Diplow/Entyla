@@ -6,7 +6,10 @@ import type { AnalysisAndDraftResult, DraftRequest, DraftResult } from "../../ob
 
 const analysisToolInputSchema = z.object({
   conversationStatus: z.enum(["continue", "stop"]),
-  stopReason: z.enum(["positive_outcome", "unresponsive", "negative_outcome"]).nullable().optional(),
+  stopReason: z.preprocess(
+    (val) => (val === "null" ? null : val),
+    z.enum(["positive_outcome", "unresponsive", "negative_outcome"]).nullable().optional(),
+  ),
   draftMessage: z.string().min(1, "draftMessage must be a non-empty string"),
 });
 
