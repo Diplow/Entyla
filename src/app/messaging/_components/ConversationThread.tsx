@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { MessageBubble } from "~/app/messaging/_components/MessageBubble";
 import { ContactResponseInput } from "~/app/messaging/_components/ContactResponseInput";
+import { ConversationStoppedBanner } from "~/app/messaging/_components/ConversationStoppedBanner";
 
 interface Message {
   id: number;
@@ -19,16 +20,6 @@ interface ConversationData {
   id: number;
   stoppedAt: string | null;
   stoppedReason: ConversationStopReason | null;
-}
-
-function getStopReasonMessage(reason: ConversationStopReason | null): string {
-  if (!reason) return "AI has stopped working on this conversation";
-  const messages: Record<ConversationStopReason, string> = {
-    positive_outcome: "Prospect showed interest - ready for manual follow-up",
-    unresponsive: "Prospect hasn't responded after multiple attempts",
-    negative_outcome: "Prospect declined - not interested",
-  };
-  return messages[reason];
 }
 
 interface ConversationThreadProps {
@@ -153,10 +144,7 @@ export function ConversationThread({
       </div>
 
       {isStopped ? (
-        <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/70">
-          <span className="font-medium">Conversation ended:</span>{" "}
-          {getStopReasonMessage(conversation?.stoppedReason ?? null)}
-        </div>
+        <ConversationStoppedBanner stoppedReason={conversation?.stoppedReason ?? null} />
       ) : (
         <ContactResponseInput
           onSubmit={handleContactResponse}

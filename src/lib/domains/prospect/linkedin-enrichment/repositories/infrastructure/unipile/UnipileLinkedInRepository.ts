@@ -54,6 +54,7 @@ export class UnipileLinkedInRepository implements LinkedInEnrichmentRepository {
       const profileResponse = await this.client.users.getProfile({
         account_id: this.accountId,
         identifier: username,
+        linkedin_sections: ["experience"],
       });
 
       const profile = profileResponse as {
@@ -62,14 +63,12 @@ export class UnipileLinkedInRepository implements LinkedInEnrichmentRepository {
         last_name?: string;
         headline?: string;
         public_identifier?: string;
-        specifics?: {
-          occupation?: string;
-          current_positions?: Array<{
-            title?: string;
-            company_name?: string;
-            company_id?: string;
-          }>;
-        };
+        work_experience?: Array<{
+          position: string;
+          company: string;
+          company_id?: string;
+          current?: boolean;
+        }>;
       };
 
       if (!profile.provider_id) {
@@ -79,30 +78,36 @@ export class UnipileLinkedInRepository implements LinkedInEnrichmentRepository {
         );
       }
 
-      const currentPosition = profile.specifics?.current_positions?.[0];
+      const currentPosition =
+        profile.work_experience?.find(
+          (experience) => experience.current === true,
+        ) ?? profile.work_experience?.[0];
       let companyData = null;
 
-      if (currentPosition?.company_name) {
+      if (currentPosition?.company) {
         try {
           const companyResponse = await this.client.users.getCompanyProfile({
             account_id: this.accountId,
-            identifier: currentPosition.company_name,
+            identifier: currentPosition.company,
           });
 
           const company = companyResponse as {
-            provider_id?: string;
+            id?: string;
             name?: string;
-            industry?: string;
-            staff_count_range?: string;
+            industry?: string[];
+            employee_count?: number;
             website?: string;
             public_identifier?: string;
           };
 
           companyData = {
-            providerId: company.provider_id ?? null,
-            name: company.name ?? currentPosition.company_name,
-            industry: company.industry ?? null,
-            size: company.staff_count_range ?? null,
+            providerId: company.id ?? null,
+            name: company.name ?? currentPosition.company,
+            industry: company.industry?.[0] ?? null,
+            size:
+              company.employee_count != null
+                ? String(company.employee_count)
+                : null,
             website: company.website ?? null,
             linkedinUrl: company.public_identifier
               ? `https://www.linkedin.com/company/${company.public_identifier}`
@@ -111,7 +116,7 @@ export class UnipileLinkedInRepository implements LinkedInEnrichmentRepository {
         } catch {
           companyData = {
             providerId: null,
-            name: currentPosition.company_name,
+            name: currentPosition.company,
             industry: null,
             size: null,
             website: null,
@@ -130,9 +135,7 @@ export class UnipileLinkedInRepository implements LinkedInEnrichmentRepository {
             profile.public_identifier ?? username,
           ),
           currentJobTitle:
-            currentPosition?.title ??
-            profile.specifics?.occupation ??
-            null,
+            currentPosition?.position ?? profile.headline ?? null,
         },
         company: companyData,
       };

@@ -1,0 +1,1 @@
+app/companies/_components/CompanyEditForm.tsx:CompanyEditForm: 110 # Simple 4-field form; extraction would create a meaningless wrapper

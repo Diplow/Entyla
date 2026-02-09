@@ -10,9 +10,11 @@ interface Contact {
   lastName: string;
   email: string | null;
   company: string | null;
+  companyId: number | null;
   jobTitle: string | null;
   phone: string | null;
   notes: string | null;
+  linkedinUrl: string | null;
   ownerId: string;
   createdAt: string;
   updatedAt: string | null;
@@ -46,7 +48,7 @@ export function ContactList({ refreshKey }: ContactListProps) {
     void fetchContacts();
   }, [refreshKey]);
 
-  async function handleContactDeleted() {
+  async function refreshContactList() {
     try {
       const response = await fetch("/api/contacts");
       if (response.ok) {
@@ -72,7 +74,8 @@ export function ContactList({ refreshKey }: ContactListProps) {
         <ContactCard
           key={contact.id}
           contact={contact}
-          onDeleted={handleContactDeleted}
+          onDeleted={refreshContactList}
+          onUpdated={refreshContactList}
         />
       ))}
     </div>

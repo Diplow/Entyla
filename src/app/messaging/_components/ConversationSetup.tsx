@@ -1,8 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import posthog from "posthog-js";
+
+import { CompanyKnowledgePrompt } from "~/app/messaging/_components/CompanyKnowledgePrompt";
+import { ContactSelectionForm } from "~/app/messaging/_components/ContactSelectionForm";
 
 interface Contact {
   id: number;
@@ -33,12 +35,14 @@ interface ConversationSetupProps {
   onConversationCreated: (conversationId: number) => void;
   onBack: () => void;
   existingConversations: EnrichedConversation[];
+  initialContactId?: number | null;
 }
 
 export function ConversationSetup({
   onConversationCreated,
   onBack,
   existingConversations,
+  initialContactId,
 }: ConversationSetupProps) {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedContactId, setSelectedContactId] = useState<number | "">("");
@@ -51,7 +55,13 @@ export function ConversationSetup({
     async function fetchContacts() {
       try {
         const response = await fetch("/api/contacts");
-        if (response.ok) setContacts((await response.json()) as Contact[]);
+        if (response.ok) {
+          const fetchedContacts = (await response.json()) as Contact[];
+          setContacts(fetchedContacts);
+          if (initialContactId && fetchedContacts.some((contact) => contact.id === initialContactId)) {
+            setSelectedContactId(initialContactId);
+          }
+        }
       } catch {
         // Silently fail
       } finally {
@@ -59,7 +69,7 @@ export function ConversationSetup({
       }
     }
     void fetchContacts();
-  }, []);
+  }, [initialContactId]);
 
   useEffect(() => {
     async function fetchOnboardingStatus() {
@@ -119,95 +129,19 @@ export function ConversationSetup({
     );
 
   if (needsCompanyKnowledge) {
-    return (
-      <div className="flex w-full max-w-md flex-col gap-4">
-        <button
-          onClick={onBack}
-          className="self-start text-sm text-white/50 transition hover:text-white"
-        >
-          &larr; Back to conversations
-        </button>
-
-        <div className="rounded-lg bg-purple-500/10 px-6 py-5 text-center">
-          <p className="mb-4 text-white/80">
-            Before starting a conversation, you need to set up your company information.
-          </p>
-          <Link
-            href="/settings"
-            className="inline-block rounded-lg bg-purple-600 px-4 py-2 font-medium transition hover:bg-purple-500"
-          >
-            Set up in Settings
-          </Link>
-        </div>
-      </div>
-    );
+    return <CompanyKnowledgePrompt onBack={onBack} />;
   }
 
   return (
-    <div className="flex w-full max-w-md flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <button
-          onClick={onBack}
-          className="text-sm text-white/50 transition hover:text-white"
-        >
-          &larr; Back to conversations
-        </button>
-        <Link
-          href="/settings"
-          className="text-sm text-white/50 transition hover:text-white"
-        >
-          Customize AI in Settings
-        </Link>
-      </div>
-
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col gap-4"
-      >
-        <div className="flex flex-col gap-2">
-          <label htmlFor="contact-select" className="text-sm font-medium">
-            Contact
-          </label>
-          <select
-            id="contact-select"
-            value={selectedContactId}
-            onChange={(event) =>
-              setSelectedContactId(Number(event.target.value) || "")
-            }
-            className="rounded-lg bg-white/10 px-4 py-2 text-white"
-            required
-          >
-            <option value="">Select a contact...</option>
-            {contacts.map((contact) => (
-              <option key={contact.id} value={contact.id}>
-                {contact.firstName} {contact.lastName}
-                {contact.company ? ` (${contact.company})` : ""}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {matchingConversation && (
-          <div className="rounded-lg bg-yellow-500/10 px-4 py-3 text-sm text-yellow-200">
-            <p>A conversation already exists with this contact.</p>
-            <button
-              type="button"
-              onClick={() => onConversationCreated(matchingConversation.id)}
-              className="mt-2 font-medium text-yellow-100 underline transition hover:text-white"
-            >
-              Open existing conversation
-            </button>
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={isLoading || !selectedContactId}
-          className="rounded-lg bg-purple-600 px-4 py-2 font-medium transition hover:bg-purple-500 disabled:opacity-50"
-        >
-          {isLoading ? "Generating First Message..." : "Generate First Message"}
-        </button>
-      </form>
-    </div>
+    <ContactSelectionForm
+      contacts={contacts}
+      selectedContactId={selectedContactId}
+      onSelectedContactIdChange={setSelectedContactId}
+      matchingConversation={matchingConversation ?? null}
+      onConversationCreated={onConversationCreated}
+      onBack={onBack}
+      onSubmit={handleSubmit}
+      isLoading={isLoading}
+    />
   );
 }

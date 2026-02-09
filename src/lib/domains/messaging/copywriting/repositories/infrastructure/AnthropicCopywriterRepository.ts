@@ -6,7 +6,10 @@ import type { AnalysisAndDraftResult, DraftRequest, DraftResult } from "../../ob
 
 const analysisToolInputSchema = z.object({
   conversationStatus: z.enum(["continue", "stop"]),
-  stopReason: z.enum(["positive_outcome", "unresponsive", "negative_outcome"]).nullable().optional(),
+  stopReason: z.preprocess(
+    (val) => (val === "null" ? null : val),
+    z.enum(["positive_outcome", "unresponsive", "negative_outcome"]).nullable().optional(),
+  ),
   draftMessage: z.string().min(1, "draftMessage must be a non-empty string"),
 });
 
@@ -40,6 +43,8 @@ function buildSystemPrompt(request: DraftRequest): string {
       sections.push(`Example ${index + 1}: ${message}`);
     });
   }
+
+  sections.push("", "## Signature", `Sign messages as: ${userAiContext.signature}`);
 
   sections.push("", "Write a short, personalized message. Be direct and professional, not pushy.");
 
@@ -107,6 +112,8 @@ function buildAnalysisSystemPrompt(request: DraftRequest): string {
       sections.push(`Example ${index + 1}: ${message}`);
     });
   }
+
+  sections.push("", "## Signature", `Sign messages as: ${userAiContext.signature}`);
 
   sections.push("", "Use the analyze_conversation tool to provide your analysis and draft (if continuing).");
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { ConversationList } from "~/app/messaging/_components/ConversationList";
 import { ConversationSetup } from "~/app/messaging/_components/ConversationSetup";
@@ -22,18 +22,41 @@ interface EnrichedConversation {
 
 type View = "list" | "setup" | "thread";
 
-export function MessagingPageContent() {
+interface MessagingPageContentProps {
+  initialContactId?: number | null;
+}
+
+export function MessagingPageContent({ initialContactId }: MessagingPageContentProps) {
   const [currentView, setCurrentView] = useState<View>("list");
   const [conversations, setConversations] = useState<EnrichedConversation[]>([]);
   const [isLoadingConversations, setIsLoadingConversations] = useState(true);
   const [activeConversationId, setActiveConversationId] = useState<number | null>(null);
+
+  const navigateToContact = useCallback(
+    (contactId: number, fetchedConversations: EnrichedConversation[]) => {
+      const existingConversation = fetchedConversations.find(
+        (conversation) => conversation.contactId === contactId,
+      );
+      if (existingConversation) {
+        setActiveConversationId(existingConversation.id);
+        setCurrentView("thread");
+      } else {
+        setCurrentView("setup");
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     async function fetchConversations() {
       try {
         const response = await fetch("/api/conversations");
         if (response.ok) {
-          setConversations((await response.json()) as EnrichedConversation[]);
+          const fetchedConversations = (await response.json()) as EnrichedConversation[];
+          setConversations(fetchedConversations);
+          if (initialContactId) {
+            navigateToContact(initialContactId, fetchedConversations);
+          }
         }
       } catch {
         // Silently fail
@@ -42,7 +65,7 @@ export function MessagingPageContent() {
       }
     }
     void fetchConversations();
-  }, []);
+  }, [initialContactId, navigateToContact]);
 
   function handleOpenConversation(conversationId: number) {
     setActiveConversationId(conversationId);
@@ -86,6 +109,7 @@ export function MessagingPageContent() {
         onConversationCreated={handleConversationCreated}
         onBack={handleBackToList}
         existingConversations={conversations}
+        initialContactId={initialContactId}
       />
     );
   }

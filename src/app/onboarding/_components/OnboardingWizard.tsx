@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { ExampleMessagesList } from "./ExampleMessagesList";
+import { AiPreferencesFields } from "~/app/_components/AiPreferencesFields";
 
 const DEFAULT_TONE_OF_VOICE =
   "Professional yet approachable. Clear and concise. Focus on demonstrating value to the prospect without being pushy. Use natural language, avoid jargon.";
@@ -12,6 +12,8 @@ interface AiPreferences {
   companyKnowledge: string | null;
   toneOfVoice: string | null;
   exampleMessages: string[];
+  signature: string | null;
+  userName: string;
 }
 
 export function OnboardingWizard() {
@@ -24,6 +26,7 @@ export function OnboardingWizard() {
   const [companyKnowledge, setCompanyKnowledge] = useState("");
   const [toneOfVoice, setToneOfVoice] = useState(DEFAULT_TONE_OF_VOICE);
   const [exampleMessages, setExampleMessages] = useState<string[]>([]);
+  const [signature, setSignature] = useState("");
 
   useEffect(() => {
     async function fetchPreferences() {
@@ -40,6 +43,7 @@ export function OnboardingWizard() {
         setCompanyKnowledge(preferences.companyKnowledge ?? "");
         setToneOfVoice(preferences.toneOfVoice ?? DEFAULT_TONE_OF_VOICE);
         setExampleMessages(preferences.exampleMessages ?? []);
+        setSignature(preferences.signature ?? preferences.userName);
       } catch (error) {
         console.log("[OnboardingWizard] Error:", error);
         // Preferences may not exist yet for new users, which is fine
@@ -73,6 +77,7 @@ export function OnboardingWizard() {
           companyKnowledge: companyKnowledge || undefined,
           toneOfVoice: toneOfVoice || undefined,
           exampleMessages,
+          signature: signature.trim() || null,
         }),
       });
 
@@ -132,55 +137,17 @@ export function OnboardingWizard() {
       )}
 
       <form onSubmit={handleCompleteSetup} className="flex flex-col gap-8">
-        <div className="flex flex-col gap-2">
-          <label htmlFor="company-knowledge" className="text-sm font-medium">
-            Company & Product Knowledge <span className="text-red-400">*</span>
-          </label>
-          <textarea
-            id="company-knowledge"
-            value={companyKnowledge}
-            onChange={(event) => setCompanyKnowledge(event.target.value)}
-            placeholder="Describe your company, products, value propositions, and target market..."
-            className="rounded-lg bg-white/10 px-4 py-3 text-white placeholder:text-white/30"
-            rows={6}
-            required
-            disabled={isSubmitting}
-          />
-          <p className="text-sm text-white/40">
-            This information helps the AI craft relevant messages
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label htmlFor="tone-of-voice" className="text-sm font-medium">
-            Tone of Voice
-          </label>
-          <textarea
-            id="tone-of-voice"
-            value={toneOfVoice}
-            onChange={(event) => setToneOfVoice(event.target.value)}
-            className="rounded-lg bg-white/10 px-4 py-3 text-white placeholder:text-white/30"
-            rows={3}
-            disabled={isSubmitting}
-          />
-          <p className="text-sm text-white/40">
-            Describe the writing style you want the AI to use
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">
-            Example Messages (Optional)
-          </label>
-          <p className="text-sm text-white/40">
-            Provide up to 10 example messages that represent your preferred
-            style
-          </p>
-          <ExampleMessagesList
-            messages={exampleMessages}
-            onChange={setExampleMessages}
-          />
-        </div>
+        <AiPreferencesFields
+          signature={signature}
+          onSignatureChange={setSignature}
+          companyKnowledge={companyKnowledge}
+          onCompanyKnowledgeChange={setCompanyKnowledge}
+          toneOfVoice={toneOfVoice}
+          onToneOfVoiceChange={setToneOfVoice}
+          exampleMessages={exampleMessages}
+          onExampleMessagesChange={setExampleMessages}
+          disabled={isSubmitting}
+        />
 
         <div className="flex flex-col gap-4">
           <button
