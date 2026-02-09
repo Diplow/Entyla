@@ -56,3 +56,4 @@ __pycache__/
 extension/node_modules
 extension/.wxt
 extension/.output
+public/extension.zip

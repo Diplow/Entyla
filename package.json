@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build",
+    "build": "cd extension && pnpm install && WXT_API_URL=$BETTER_AUTH_URL pnpm zip && cp .output/ai-boilerplate-extension-*-chrome.zip ../public/extension.zip && cd .. && next build",
     "check": "eslint . && tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
