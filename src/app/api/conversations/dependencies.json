@@ -1,4 +1,0 @@
-{
-  "type": "api",
-  "allowed": ["~/lib/domains/iam", "~/lib/domains/prospect", "~/lib/domains/messaging", "~/lib/logging", "~/server/better-auth", "zod"]
-}

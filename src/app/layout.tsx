@@ -9,8 +9,8 @@ import { LandingPage } from "~/app/_components/landing-page";
 import { OnboardingGuard } from "~/app/_components/onboarding-guard";
 
 export const metadata: Metadata = {
-  title: "Ai Boilerplate",
-  description: "Automate your sales prospection with AI-powered messaging",
+  title: "Entyla",
+  description: "AI experimentation portfolio tracker",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
@@ -34,8 +34,6 @@ export default async function RootLayout({
     );
   }
 
-  const { remainingCredits } = await IamService.checkCredits(currentUser.id);
-
   return (
     <html lang="en" className={`${geist.variable}`}>
       <body className="flex flex-col h-screen overflow-hidden bg-gradient-to-b from-[#2e026d] to-[#15162c]">
@@ -43,7 +41,6 @@ export default async function RootLayout({
           <Header
             userName={currentUser.name}
             userImage={currentUser.image ?? null}
-            remainingCredits={remainingCredits}
           />
           {children}
         </OnboardingGuard>

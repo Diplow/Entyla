@@ -20,6 +20,9 @@ export const env = createEnv({
     UNIPILE_DSN_ID: z.string().optional(),
     UNIPILE_LINKEDIN_ACCOUNT_ID: z.string().optional(),
     CHROME_EXTENSION_ID: z.string().optional(),
+    SLACK_BOT_TOKEN: z.string().optional(),
+    SLACK_SIGNING_SECRET: z.string().optional(),
+    CRON_SECRET: z.string().optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -51,6 +54,9 @@ export const env = createEnv({
     UNIPILE_DSN_ID: process.env.UNIPILE_DSN_ID,
     UNIPILE_LINKEDIN_ACCOUNT_ID: process.env.UNIPILE_LINKEDIN_ACCOUNT_ID,
     CHROME_EXTENSION_ID: process.env.CHROME_EXTENSION_ID,
+    SLACK_BOT_TOKEN: process.env.SLACK_BOT_TOKEN,
+    SLACK_SIGNING_SECRET: process.env.SLACK_SIGNING_SECRET,
+    CRON_SECRET: process.env.CRON_SECRET,
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     NODE_ENV: process.env.NODE_ENV,

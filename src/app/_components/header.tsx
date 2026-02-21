@@ -7,7 +7,6 @@ import { SignOutButton } from "~/app/_components/sign-out-button";
 interface HeaderProps {
   userName: string;
   userImage: string | null;
-  remainingCredits: number;
 }
 
 function UserAvatar({ userName, userImage }: { userName: string; userImage: string | null }) {
@@ -42,14 +41,19 @@ function UserAvatar({ userName, userImage }: { userName: string; userImage: stri
   );
 }
 
-export function Header({ userName, userImage, remainingCredits }: HeaderProps) {
+export function Header({ userName, userImage }: HeaderProps) {
   return (
     <header className="flex w-full items-center justify-between px-6 py-4">
       <Link href="/" className="text-lg font-bold text-white no-underline">
-        Ai Boilerplate
+        Entyla
       </Link>
       <div className="flex items-center gap-4">
-        <span className="text-sm text-white/70">{remainingCredits} credits</span>
+        <Link
+          href="/dashboard"
+          className="text-sm text-white/70 transition hover:text-white"
+        >
+          Dashboard
+        </Link>
         <UserAvatar userName={userName} userImage={userImage} />
         <Link
           href="/settings"

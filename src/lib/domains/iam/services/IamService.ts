@@ -1,32 +1,54 @@
-import { BetterAuthUserRepository } from "../repositories";
-import { AiPreferencesService, BillingService } from "../subdomains";
-import type { AiPreferences, AiPreferencesInput } from "../subdomains";
-import type { User } from "../objects";
+import {
+  BetterAuthUserRepository,
+  DrizzleMembershipRepository,
+  DrizzleSlackUserMappingRepository,
+} from "../repositories";
+import type {
+  User,
+  Organization,
+  Membership,
+  MemberRole,
+  SlackUserMapping,
+} from "../objects";
 
 const userRepository = new BetterAuthUserRepository();
+const membershipRepository = new DrizzleMembershipRepository();
+const slackMappingRepository = new DrizzleSlackUserMappingRepository();
 
 export const IamService = {
   getCurrentUser: (): Promise<User | null> => userRepository.getCurrentUser(),
 
-  checkCredits: (userId: string) =>
-    BillingService.checkCredits(userId),
+  getCurrentOrganization: (userId: string): Promise<Organization | null> =>
+    membershipRepository.findOrganizationByUser(userId),
 
-  recordUsage: (userId: string, inputTokens: number, outputTokens: number, model: string) =>
-    BillingService.recordUsage(userId, inputTokens, outputTokens, model),
+  getUserMembership: (userId: string): Promise<Membership | null> =>
+    membershipRepository.findByUser(userId),
 
-  // AI Preferences
-  getAiPreferences: (userId: string): Promise<AiPreferences | null> =>
-    AiPreferencesService.getByUserId(userId),
+  getUserRole: async (userId: string): Promise<MemberRole | null> => {
+    const membership = await membershipRepository.findByUser(userId);
+    return membership?.role ?? null;
+  },
 
-  updateAiPreferences: (userId: string, input: AiPreferencesInput): Promise<AiPreferences> =>
-    AiPreferencesService.upsert(userId, input),
+  isAdmin: async (userId: string): Promise<boolean> => {
+    const membership = await membershipRepository.findByUser(userId);
+    return membership?.role === "admin";
+  },
 
-  isOnboardingCompleted: (userId: string): Promise<boolean> =>
-    AiPreferencesService.isOnboardingCompleted(userId),
+  getUserBySlackId: (
+    slackUserId: string,
+    slackTeamId: string,
+  ): Promise<SlackUserMapping | null> =>
+    slackMappingRepository.findBySlackUserId(slackUserId, slackTeamId),
 
-  completeOnboarding: (userId: string): Promise<void> =>
-    AiPreferencesService.completeOnboarding(userId),
+  linkSlackUser: (
+    userId: string,
+    slackUserId: string,
+    slackTeamId: string,
+  ): Promise<SlackUserMapping> =>
+    slackMappingRepository.create(userId, slackUserId, slackTeamId),
 
-  hasCompanyKnowledge: (userId: string): Promise<boolean> =>
-    AiPreferencesService.hasCompanyKnowledge(userId),
+  getOrgMembersWithSlack: (
+    organizationId: number,
+  ): Promise<SlackUserMapping[]> =>
+    slackMappingRepository.findAllByOrganization(organizationId),
 };

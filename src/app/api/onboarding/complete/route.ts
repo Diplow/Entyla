@@ -8,8 +8,8 @@ async function handleCompleteOnboarding() {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await IamService.completeOnboarding(currentUser.id);
-
+  // For POC, onboarding completion is a no-op
+  // In future, this could set up default initiatives, Slack connection, etc.
   return Response.json({ success: true });
 }
 

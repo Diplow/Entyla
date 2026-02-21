@@ -10,6 +10,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "db:seed": "npx tsx scripts/seed.ts",
     "dev": "next dev",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
@@ -27,6 +28,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.1",
     "@auth/drizzle-adapter": "^1.7.2",
+    "@slack/web-api": "^7.14.1",
     "@t3-oss/env-nextjs": "^0.12.0",
     "better-auth": "^1.3",
     "drizzle-orm": "^0.41.0",

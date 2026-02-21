@@ -1,0 +1,4 @@
+{
+  "type": "leaf",
+  "allowed": ["~/lib/domains/iam", "~/lib/domains/finance", "~/lib/logging", "~/server/better-auth"]
+}

@@ -1,5 +1,0 @@
-{
-  "type": "router",
-  "allowed": [],
-  "subsystems": ["./drizzle"]
-}

@@ -1,5 +1,5 @@
 {
   "type": "router",
-  "allowed": ["~/lib/domains/iam", "~/lib/domains/prospect", "~/lib/domains/messaging", "zod"],
-  "subsystems": ["./ai-preferences", "./auth", "./contacts", "./conversations", "./current-user", "./onboarding"]
+  "allowed": ["~/lib/domains/iam", "~/lib/domains/prospect", "~/lib/domains/finance", "~/lib/domains/coaching", "zod"],
+  "subsystems": ["./auth", "./coaching", "./contacts", "./current-user", "./onboarding", "./reporting"]
 }

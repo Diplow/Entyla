@@ -1,5 +1,5 @@
 {
   "type": "router",
   "allowed": [],
-  "subsystems": ["./better-auth"]
+  "subsystems": ["./better-auth", "./drizzle"]
 }

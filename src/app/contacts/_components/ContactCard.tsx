@@ -95,12 +95,6 @@ export function ContactCard({ contact, onDeleted, onUpdated }: ContactCardProps)
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <LinkedInLink linkedinUrl={contact.linkedinUrl} />
-          <Link
-            href={`/messaging?contactId=${contact.id}`}
-            className="rounded-lg bg-purple-500/20 px-3 py-1 text-sm text-purple-300 transition hover:bg-purple-500/30"
-          >
-            Message
-          </Link>
           <button
             onClick={() => setIsEditing(true)}
             className="rounded-lg bg-white/10 px-3 py-1 text-sm text-white/70 transition hover:bg-white/20"

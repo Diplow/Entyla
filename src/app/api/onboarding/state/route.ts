@@ -8,17 +8,14 @@ async function handleGetOnboardingState() {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const isOnboardingCompleted = await IamService.isOnboardingCompleted(
-    currentUser.id,
-  );
-
+  // For POC, onboarding is considered completed once user has logged in
   return Response.json({
     currentUser: {
       id: currentUser.id,
       name: currentUser.name,
       email: currentUser.email,
     },
-    isOnboardingCompleted,
+    isOnboardingCompleted: true,
   });
 }
 

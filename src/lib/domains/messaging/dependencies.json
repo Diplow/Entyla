@@ -1,5 +1,0 @@
-{
-  "type": "domain",
-  "allowed": ["~/lib/logging"],
-  "subsystems": ["./objects", "./repositories", "./actions", "./services", "./copywriting"]
-}

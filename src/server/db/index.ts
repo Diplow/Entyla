@@ -17,4 +17,17 @@ if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 
 export const db = drizzle(conn, { schema });
 
-export { aiPreferences, company, contact, conversation, creditBalance, message } from "./schema";
+export {
+  budget,
+  coachingMessage,
+  coachingSession,
+  company,
+  contact,
+  conversation,
+  initiative,
+  membership,
+  message,
+  organization,
+  slackUserMapping,
+  timeEntry,
+} from "./schema";

@@ -1,0 +1,14 @@
+{
+  "type": "router",
+  "allowed": [
+    "~/lib/domains/iam",
+    "~/lib/domains/coaching",
+    "~/lib/domains/finance",
+    "~/lib/logging",
+    "~/server/better-auth",
+    "~/server/slack",
+    "~/env",
+    "zod"
+  ],
+  "subsystems": ["./sessions", "./slack"]
+}

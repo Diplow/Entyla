@@ -8,12 +8,9 @@ async function handleGetOnboardingStatus() {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const [completed, hasCompanyKnowledge] = await Promise.all([
-    IamService.isOnboardingCompleted(currentUser.id),
-    IamService.hasCompanyKnowledge(currentUser.id),
-  ]);
-
-  return Response.json({ completed, hasCompanyKnowledge });
+  // For POC, onboarding is considered completed once user has logged in
+  // In future, this could check for Slack connection or other setup steps
+  return Response.json({ completed: true, hasCompanyKnowledge: false });
 }
 
 const handlers = withApiLogging(

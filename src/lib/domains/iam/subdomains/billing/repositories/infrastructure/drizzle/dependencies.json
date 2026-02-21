@@ -1,4 +1,0 @@
-{
-  "type": "boundary",
-  "allowed": ["~/server/db", "drizzle-orm"]
-}

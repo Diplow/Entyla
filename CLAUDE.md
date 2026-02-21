@@ -1,11 +1,17 @@
 ## Product Description
 
-AI-powered sales prospection platform that helps sales teams automate and streamline their prospection workflow. The platform enables users to track potential customers (prospects), manage contacts within those organizations, and leverage AI to accelerate outreach and qualification.
+Slack-first tool that gives leaders weekly, decision-grade visibility into their AI experimentation portfolio. A company defines an AI experimentation budget, team members timesheet against it via a Slackbot, and structured initiatives emerge organically from exploration — validated by an admin before becoming official.
+
+The flow: **open exploration → surface what's promising → formalize into initiatives → track burn across the portfolio.**
+
+The Slackbot is LLM-powered and actively coaches participants — giving feedback, suggesting next steps, and keeping people engaged. This makes timesheeting feel like a conversation with a supportive coach rather than a form to fill out.
 
 Core concepts:
 
-- **Prospects**: Potential customer organizations being tracked through the sales pipeline
-- **Contacts**: Individual people within prospect organizations
+- **Budget**: Monthly person-days allocated to AI experimentation across the org
+- **Initiatives**: Formalized experiments that emerge from open exploration and are approved by an admin
+- **Timesheeting**: Weekly Slack-based logging of time invested, with AI coaching responses
+- **Dashboard**: Live view of budget burn, initiative progress, emerging trends, and signals requiring attention
 
 ---
 

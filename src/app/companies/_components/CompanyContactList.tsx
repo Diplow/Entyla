@@ -28,9 +28,10 @@ export function CompanyContactList({ contacts }: CompanyContactListProps) {
       <h2 className="mb-2 text-lg font-semibold">Contacts</h2>
       <div className="flex flex-col gap-2">
         {contacts.map((contact) => (
-          <div
+          <Link
             key={contact.id}
-            className="flex items-center justify-between rounded-lg bg-white/10 px-4 py-3"
+            href={`/contacts/${contact.id}`}
+            className="flex items-center justify-between rounded-lg bg-white/10 px-4 py-3 transition hover:bg-white/20"
           >
             <div>
               <p className="font-medium">
@@ -40,13 +41,7 @@ export function CompanyContactList({ contacts }: CompanyContactListProps) {
                 <p className="text-sm text-white/70">{contact.jobTitle}</p>
               )}
             </div>
-            <Link
-              href={`/messaging?contactId=${contact.id}`}
-              className="rounded-lg bg-purple-500/20 px-3 py-1 text-sm text-purple-300 transition hover:bg-purple-500/30"
-            >
-              Message
-            </Link>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

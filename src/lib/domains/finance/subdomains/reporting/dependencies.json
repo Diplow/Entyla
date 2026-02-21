@@ -1,0 +1,5 @@
+{
+  "type": "boundary",
+  "allowed": [],
+  "subsystems": ["./objects", "./actions", "./services"]
+}

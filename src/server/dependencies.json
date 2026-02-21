@@ -1,5 +1,5 @@
 {
   "type": "router",
   "allowed": ["~/lib", "~/env"],
-  "subsystems": ["./db", "./better-auth"]
+  "subsystems": ["./db", "./better-auth", "./slack"]
 }

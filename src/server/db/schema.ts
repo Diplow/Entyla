@@ -2,9 +2,9 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   index,
-  integer,
   pgTable,
   pgTableCreator,
+  real,
   text,
   timestamp,
   uniqueIndex,
@@ -96,6 +96,7 @@ export const verification = pgTable("verification", {
 export const userRelations = relations(user, ({ many }) => ({
   account: many(account),
   session: many(session),
+  memberships: many(membership),
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
@@ -104,6 +105,59 @@ export const accountRelations = relations(account, ({ one }) => ({
 
 export const sessionRelations = relations(session, ({ one }) => ({
   user: one(user, { fields: [session.userId], references: [user.id] }),
+}));
+
+export const organization = createTable(
+  "organization",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    name: d.varchar({ length: 200 }).notNull(),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+  }),
+  (t) => [index("organization_name_idx").on(t.name)],
+);
+
+export const membership = createTable(
+  "membership",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    userId: d
+      .varchar({ length: 255 })
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    organizationId: d
+      .integer()
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    role: d.varchar({ length: 20 }).notNull(),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+  }),
+  (t) => [
+    uniqueIndex("membership_user_org_idx").on(t.userId, t.organizationId),
+    index("membership_org_idx").on(t.organizationId),
+  ],
+);
+
+export const organizationRelations = relations(organization, ({ many }) => ({
+  memberships: many(membership),
+  budgets: many(budget),
+  initiatives: many(initiative),
+}));
+
+export const membershipRelations = relations(membership, ({ one }) => ({
+  user: one(user, { fields: [membership.userId], references: [user.id] }),
+  organization: one(organization, {
+    fields: [membership.organizationId],
+    references: [organization.id],
+  }),
 }));
 
 export const company = createTable(
@@ -210,27 +264,141 @@ export const message = createTable(
   (t) => [index("message_conversation_idx").on(t.conversationId)],
 );
 
-export const creditBalance = createTable(
-  "credit_balance",
+// Finance domain tables
+
+export const budget = createTable(
+  "budget",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    organizationId: d
+      .integer()
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    totalPersonDays: d.integer().notNull(),
+    periodStart: d.timestamp({ withTimezone: true }).notNull(),
+    periodEnd: d.timestamp({ withTimezone: true }).notNull(),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+  }),
+  (t) => [
+    index("budget_org_idx").on(t.organizationId),
+    uniqueIndex("budget_org_period_idx").on(
+      t.organizationId,
+      t.periodStart,
+      t.periodEnd,
+    ),
+  ],
+);
+
+export const initiative = createTable(
+  "initiative",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    organizationId: d
+      .integer()
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    name: d.varchar({ length: 200 }).notNull(),
+    description: d.text(),
+    status: d.varchar({ length: 20 }).notNull(),
+    isDefaultBucket: d.boolean().default(false).notNull(),
+    proposedById: d
+      .varchar({ length: 255 })
+      .references(() => user.id, { onDelete: "set null" }),
+    approvedById: d
+      .varchar({ length: 255 })
+      .references(() => user.id, { onDelete: "set null" }),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+  }),
+  (t) => [
+    index("initiative_org_idx").on(t.organizationId),
+    index("initiative_status_idx").on(t.status),
+  ],
+);
+
+export const timeEntry = createTable(
+  "time_entry",
   (d) => ({
     id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
     userId: d
       .varchar({ length: 255 })
       .notNull()
-      .references(() => user.id),
-    remainingCredits: integer("remaining_credits").notNull(),
-    monthlyAllowance: integer("monthly_allowance").notNull(),
-    periodStart: d
+      .references(() => user.id, { onDelete: "cascade" }),
+    initiativeId: d
+      .integer()
+      .notNull()
+      .references(() => initiative.id, { onDelete: "cascade" }),
+    personDays: real("person_days").notNull(),
+    weekOf: d.timestamp({ withTimezone: true }).notNull(),
+    note: d.text(),
+    createdAt: d
       .timestamp({ withTimezone: true })
-      .notNull(),
-    periodEnd: d
-      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
       .notNull(),
   }),
   (t) => [
-    index("credit_balance_user_idx").on(t.userId),
-    uniqueIndex("pg-drizzle_credit_balance_user_period_uniq").on(t.userId, t.periodStart, t.periodEnd),
+    index("time_entry_user_idx").on(t.userId),
+    index("time_entry_initiative_idx").on(t.initiativeId),
+    uniqueIndex("time_entry_user_initiative_week_idx").on(
+      t.userId,
+      t.initiativeId,
+      t.weekOf,
+    ),
   ],
+);
+
+// Coaching domain tables
+
+export const coachingSession = createTable(
+  "coaching_session",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    userId: d
+      .varchar({ length: 255 })
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    organizationId: d
+      .integer()
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    weekOf: d.timestamp({ withTimezone: true }).notNull(),
+    status: d.varchar({ length: 20 }).notNull(),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    completedAt: d.timestamp({ withTimezone: true }),
+  }),
+  (t) => [
+    index("coaching_session_user_idx").on(t.userId),
+    uniqueIndex("coaching_session_user_week_idx").on(t.userId, t.weekOf),
+    index("coaching_session_org_idx").on(t.organizationId),
+  ],
+);
+
+export const coachingMessage = createTable(
+  "coaching_message",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    sessionId: d
+      .integer()
+      .notNull()
+      .references(() => coachingSession.id, { onDelete: "cascade" }),
+    role: d.varchar({ length: 20 }).notNull(),
+    content: d.text().notNull(),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+  }),
+  (t) => [index("coaching_message_session_idx").on(t.sessionId)],
 );
 
 export const companyRelations = relations(company, ({ one, many }) => ({
@@ -253,30 +421,97 @@ export const messageRelations = relations(message, ({ one }) => ({
   conversation: one(conversation, { fields: [message.conversationId], references: [conversation.id] }),
 }));
 
-export const aiPreferences = createTable(
-  "ai_preferences",
-  (col) => ({
-    id: col.integer().primaryKey().generatedByDefaultAsIdentity(),
-    userId: col
+// Finance domain relations
+
+export const budgetRelations = relations(budget, ({ one }) => ({
+  organization: one(organization, {
+    fields: [budget.organizationId],
+    references: [organization.id],
+  }),
+}));
+
+export const initiativeRelations = relations(initiative, ({ one, many }) => ({
+  organization: one(organization, {
+    fields: [initiative.organizationId],
+    references: [organization.id],
+  }),
+  proposedBy: one(user, {
+    fields: [initiative.proposedById],
+    references: [user.id],
+    relationName: "proposedInitiatives",
+  }),
+  approvedBy: one(user, {
+    fields: [initiative.approvedById],
+    references: [user.id],
+    relationName: "approvedInitiatives",
+  }),
+  timeEntries: many(timeEntry),
+}));
+
+export const timeEntryRelations = relations(timeEntry, ({ one }) => ({
+  user: one(user, { fields: [timeEntry.userId], references: [user.id] }),
+  initiative: one(initiative, {
+    fields: [timeEntry.initiativeId],
+    references: [initiative.id],
+  }),
+}));
+
+// Coaching domain relations
+
+export const coachingSessionRelations = relations(
+  coachingSession,
+  ({ one, many }) => ({
+    user: one(user, {
+      fields: [coachingSession.userId],
+      references: [user.id],
+    }),
+    organization: one(organization, {
+      fields: [coachingSession.organizationId],
+      references: [organization.id],
+    }),
+    messages: many(coachingMessage),
+  }),
+);
+
+export const coachingMessageRelations = relations(
+  coachingMessage,
+  ({ one }) => ({
+    session: one(coachingSession, {
+      fields: [coachingMessage.sessionId],
+      references: [coachingSession.id],
+    }),
+  }),
+);
+
+// Slack integration table
+
+export const slackUserMapping = createTable(
+  "slack_user_mapping",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    userId: d
       .varchar({ length: 255 })
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    companyKnowledge: col.text(),
-    toneOfVoice: col.text(),
-    exampleMessages: col.text(),
-    signature: col.text(),
-    onboardingCompleted: col.integer().default(0).notNull(),
-    createdAt: col
+    slackUserId: d.varchar({ length: 50 }).notNull(),
+    slackTeamId: d.varchar({ length: 50 }).notNull(),
+    createdAt: d
       .timestamp({ withTimezone: true })
       .$defaultFn(() => new Date())
       .notNull(),
-    updatedAt: col.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
   }),
-  (table) => [
-    uniqueIndex("ai_preferences_user_idx").on(table.userId),
+  (t) => [
+    uniqueIndex("slack_user_mapping_user_idx").on(t.userId),
+    uniqueIndex("slack_user_mapping_slack_idx").on(t.slackUserId, t.slackTeamId),
   ],
 );
 
-export const aiPreferencesRelations = relations(aiPreferences, ({ one }) => ({
-  user: one(user, { fields: [aiPreferences.userId], references: [user.id] }),
-}));
+export const slackUserMappingRelations = relations(
+  slackUserMapping,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [slackUserMapping.userId],
+      references: [user.id],
+    }),
+  }),
+);

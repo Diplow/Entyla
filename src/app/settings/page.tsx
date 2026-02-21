@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { AiPreferencesForm } from "~/app/settings/_components";
 
 interface CurrentUser {
   id: string;
@@ -52,10 +51,12 @@ export default function SettingsPage() {
         <div className="text-center">
           <h1 className="text-5xl font-extrabold tracking-tight">Settings</h1>
           <p className="mt-2 text-lg text-white/60">
-            Configure your AI assistant
+            Account: {currentUser.email}
           </p>
         </div>
-        <AiPreferencesForm />
+        <div className="w-full max-w-2xl rounded-lg border border-white/10 bg-white/5 p-6">
+          <p className="text-white/60">Settings will be available soon.</p>
+        </div>
       </div>
     </main>
   );
