@@ -2,6 +2,7 @@ import { verifySlackSignature, sendSlackDirectMessage } from "~/server/slack";
 import { IamService } from "~/lib/domains/iam";
 import { CoachingService, type UserReport } from "~/lib/domains/coaching";
 import { buildCoachingContext, getStartOfCurrentWeek } from "../../buildContext";
+import { env } from "~/env";
 
 interface SlackEvent {
   type: string;
@@ -60,9 +61,15 @@ export async function POST(request: Request): Promise<Response> {
       slackTeamId,
     );
     if (!slackMapping) {
+      const invitation = await IamService.getOrCreateSlackInvitation(
+        slackUserId,
+        slackTeamId,
+        null,
+      );
+      const magicLink = `${env.BETTER_AUTH_URL}/api/auth/slack-link/${invitation.token}`;
       await sendSlackDirectMessage(
         slackUserId,
-        "I don't recognize your Slack account. Please link it in the dashboard first.",
+        `Welcome! To get started, please link your account:\n${magicLink}\n\nThis link expires in 7 days.`,
       );
       return Response.json({ ok: true });
     }

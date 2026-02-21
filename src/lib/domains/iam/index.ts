@@ -11,4 +11,5 @@ export type {
   Membership,
   MemberRole,
   SlackUserMapping,
+  SlackInvitation,
 } from "./objects";

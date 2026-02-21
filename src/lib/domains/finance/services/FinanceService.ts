@@ -73,6 +73,21 @@ export const FinanceService = {
     note: string | null,
   ) => logTime(timeEntryRepository, userId, initiativeId, personDays, weekOf, note),
 
+  addTimeToInitiative: (
+    userId: string,
+    initiativeId: number,
+    personDays: number,
+    weekOf: Date,
+    note: string | null,
+  ) =>
+    timeEntryRepository.upsertAdditive({
+      userId,
+      initiativeId,
+      personDays,
+      weekOf,
+      note,
+    }),
+
   getTimeEntriesByInitiative: (initiativeId: number) =>
     getTimeEntriesByInitiative(timeEntryRepository, initiativeId),
 

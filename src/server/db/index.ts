@@ -28,6 +28,7 @@ export {
   membership,
   message,
   organization,
+  slackInvitation,
   slackUserMapping,
   timeEntry,
 } from "./schema";

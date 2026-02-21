@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, sum } from "drizzle-orm";
+import { eq, and, gte, lte, sum, sql } from "drizzle-orm";
 
 import { db, timeEntry, initiative } from "~/server/db";
 import type { TimeEntryRepository } from "../../TimeEntryRepository";
@@ -12,6 +12,22 @@ export class DrizzleTimeEntryRepository implements TimeEntryRepository {
       .returning();
 
     return insertedEntry!;
+  }
+
+  async upsertAdditive(input: TimeEntryCreateInput): Promise<TimeEntry> {
+    const [upsertedEntry] = await db
+      .insert(timeEntry)
+      .values(input)
+      .onConflictDoUpdate({
+        target: [timeEntry.userId, timeEntry.initiativeId, timeEntry.weekOf],
+        set: {
+          personDays: sql`${timeEntry.personDays} + ${input.personDays}`,
+          note: input.note ?? null,
+        },
+      })
+      .returning();
+
+    return upsertedEntry!;
   }
 
   async findByUserAndWeek(

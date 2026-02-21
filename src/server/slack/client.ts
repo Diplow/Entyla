@@ -3,6 +3,13 @@ import { env } from "~/env";
 
 let slackClientInstance: WebClient | null = null;
 
+export interface SlackMember {
+  id: string;
+  name: string;
+  realName: string | undefined;
+  email: string | undefined;
+}
+
 export function getSlackClient(): WebClient {
   if (!slackClientInstance) {
     if (!env.SLACK_BOT_TOKEN) {
@@ -31,5 +38,41 @@ export async function sendSlackDirectMessage(
   await slackClient.chat.postMessage({
     channel: channelId,
     text: messageText,
+  });
+}
+
+export async function getSlackWorkspaceMembers(): Promise<SlackMember[]> {
+  const slackClient = getSlackClient();
+  const result = await slackClient.users.list({ limit: 200 });
+
+  const members: SlackMember[] = [];
+  for (const member of result.members ?? []) {
+    if (member.is_bot || member.deleted || !member.id || !member.name) {
+      continue;
+    }
+    members.push({
+      id: member.id,
+      name: member.name,
+      realName: member.real_name,
+      email: member.profile?.email,
+    });
+  }
+
+  return members;
+}
+
+export async function postSlackResponse(
+  responseUrl: string,
+  text: string,
+  replaceOriginal = false,
+): Promise<void> {
+  await fetch(responseUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text,
+      replace_original: replaceOriginal,
+      response_type: "ephemeral",
+    }),
   });
 }

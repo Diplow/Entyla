@@ -1,19 +1,37 @@
-# AI Boilerplate
+# Entyla — AI Experimentation Portfolio Tracker
 
-A [T3 Stack](https://create.t3.gg/) boilerplate configured for AI-assisted development with enforced architecture constraints.
+A Slack-first tool that gives leaders weekly, decision-grade visibility into their AI experimentation portfolio.
+
+## What it does
+
+Companies tell teams to "experiment with AI" but have no structured way to track what's happening, what it's costing, or what's worth continuing. Entyla provides that visibility through a simple flow:
+
+**Open exploration → Surface what's promising → Formalize into initiatives → Track burn across the portfolio**
+
+### Core features
+
+- **Slack-based timesheeting** — Weekly check-ins that feel like conversations, not forms. Team members log time invested and what they explored.
+- **AI coaching** — The bot responds with contextual feedback, encouragement, and practical suggestions. It keeps experiments alive by coaching people through the hard parts.
+- **Initiative proposal flow** — When the bot detects momentum, it suggests formalizing work into a tracked initiative. Admins validate before it becomes official.
+- **Budget dashboard** — Live view of person-days consumed vs. remaining, burn by initiative, trends, and signals requiring attention.
+
+### Target users
+
+- **Companies**: 50+ employees encouraging AI experimentation but lacking visibility
+- **Buyer**: Any leader accountable for making AI experimentation productive
+- **Participants**: Anyone in the company — engineers, ops, sales, support, finance, HR
 
 ## Stack
 
-- **[Next.js](https://nextjs.org)** - React framework
-- **[Drizzle](https://orm.drizzle.team)** - TypeScript ORM
-- **[Tailwind CSS](https://tailwindcss.com)** - Utility-first CSS
-- **[Better Auth](https://www.better-auth.com)** - Authentication
-
-Created with `create-t3-app` (without tRPC).
+- **[Next.js](https://nextjs.org)** — React framework
+- **[Drizzle](https://orm.drizzle.team)** — TypeScript ORM
+- **[Tailwind CSS](https://tailwindcss.com)** — Utility-first CSS
+- **[Better Auth](https://www.better-auth.com)** — Authentication
+- **[Slack API](https://api.slack.com)** — Bot interactions and messaging
 
 ## Architecture
 
-This boilerplate enforces two complementary architectural patterns:
+The codebase enforces two complementary architectural patterns:
 
 ### Subsystem Architecture
 

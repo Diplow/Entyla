@@ -1,0 +1,4 @@
+{
+  "type": "boundary",
+  "allowed": ["~/lib/domains/iam", "~/env", "next"]
+}

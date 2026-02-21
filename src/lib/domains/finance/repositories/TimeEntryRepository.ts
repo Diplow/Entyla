@@ -2,6 +2,7 @@ import type { TimeEntry, TimeEntryCreateInput } from "../objects";
 
 export interface TimeEntryRepository {
   create(input: TimeEntryCreateInput): Promise<TimeEntry>;
+  upsertAdditive(input: TimeEntryCreateInput): Promise<TimeEntry>;
   findByUserAndWeek(
     userId: string,
     initiativeId: number,

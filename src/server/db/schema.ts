@@ -515,3 +515,37 @@ export const slackUserMappingRelations = relations(
     }),
   }),
 );
+
+// Slack invitation table for magic link onboarding
+
+export const slackInvitation = createTable(
+  "slack_invitation",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    token: d.varchar({ length: 64 }).notNull().unique(),
+    slackUserId: d.varchar({ length: 50 }).notNull(),
+    slackTeamId: d.varchar({ length: 50 }).notNull(),
+    organizationId: d
+      .integer()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    expiresAt: d.timestamp({ withTimezone: true }).notNull(),
+    usedAt: d.timestamp({ withTimezone: true }),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+  }),
+  (t) => [
+    uniqueIndex("slack_invitation_slack_idx").on(t.slackUserId, t.slackTeamId),
+  ],
+);
+
+export const slackInvitationRelations = relations(
+  slackInvitation,
+  ({ one }) => ({
+    organization: one(organization, {
+      fields: [slackInvitation.organizationId],
+      references: [organization.id],
+    }),
+  }),
+);

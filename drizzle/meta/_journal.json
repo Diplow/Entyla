@@ -106,6 +106,13 @@
       "when": 1771675775444,
       "tag": "0014_special_the_enforcers",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1771680054623,
+      "tag": "0015_chubby_kulan_gath",
+      "breakpoints": true
     }
   ]
 }
