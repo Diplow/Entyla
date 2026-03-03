@@ -1,3 +1,6 @@
 [submodule "scripts/checks/architecture"]
 	path = scripts/checks/architecture
 	url = git@github.com:Diplow/subsystem-architecture.git
+[submodule "entyla-design"]
+	path = entyla-design
+	url = git@github.com:Diplow/entyla-design.git
